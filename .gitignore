@@ -1,11 +1,11 @@
 # custom project stuff:
-/data
+/data/
 *.mp3
-.zip
+*.zip
 
 # mac
-.DS_store
-.todo
+*.DS_store
+*.todo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
