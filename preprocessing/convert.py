@@ -6,16 +6,14 @@ for training.
 # I added a comment right here!
 
 from librosa import load
+from typing import List, Set
 import numpy as np
 
 from preprocessing.tracks.paths import get_audio_path
+from preprocessing.tracks.mp3 import MP3
 
 
-class InvalidFMASizeSpecification(Exception):
-    pass
-
-
-def unique_shapes(X):
+def unique_shapes(X: List[np.array]) -> Set[int]:
     """
     Takes a list of numpy arrays, X, and compiles the shapes of the
     components. To be used inside the `prepare_mp3s_and_lables` function
@@ -27,31 +25,21 @@ def unique_shapes(X):
     return shapes
 
 
-def prepare_mp3s_and_labels(audio_dir: str,
-                            meta_df: pd.DataFrame,
-                            len_second=1.0,
-                            track_id_col: str='track_id'):
-    """
-    Needs a dataframe where
-    * rows are individual tracks
-    * columns are 'track_id', 'genre', and (optionally) 'split_label'.
+def prepare_mp3s_and_labels(mp3_list: List[MP3],
+                            sr: int=22050,
+                            split_option: str=False) -> Tuple[np.array, np.array, List[str]]:
+    if split_option:
+        split_labels = []
 
-    If the 'split_label' column is omitted (e.g. you wish to create
-    a custom train/test split) then the code will process the files
-    without the splitting labels.
-    """
-    sources = []
-    genres = []
-    split_labels = []
+    genre = []
     count = 0
-    # for tr_id in track_ids:
-    for tr_id in meta_df.loc[track_id_col].tolist():
+    num_unprocessed = 0
+    sources = np.empty((len(mp3_list), 1, sr))
+    
+    for mp3 in mp3_list:
         try:
             count += 1
-            src, sr = load(
-                get_audio_path(audio_dir, tr_id),
-                sr=None, mono=True
-            )
+            src, sr = load(mp3.path, sr=sr, mono=True)
 
             # trims the src file to be the correct length
             src = src[:int(sr * len_second)]
@@ -60,24 +48,26 @@ def prepare_mp3s_and_labels(audio_dir: str,
             # layer that the mp3 is in mono format.
             src = src[np.newaxis, :]
 
-            sources.append(src)
+            # add in this source to the sources array
+            sources[count - 1, :, :] = src[:, :]
 
             # append the genre from metadata
-            genres.append(
-                meta_df.loc[meta_df['track_id'] == tr_id,
-                            ('track', 'genre_top')].values[0])
+            # genres.append(
+            #     meta_df.loc[meta_df['track_id'] == tr_id,
+            #                 ('track', 'genre_top')].values[0])
 
             # append train/valid/test splitting labels
-            split_labels.append(
-                meta_df.loc[meta_df['track_id'] == tr_id,
-                            ('set', 'split')].values[0])
+            if split_option:
+                split_labels.append(
+                    meta_df.loc[meta_df['track_id'] == tr_id,
+                                ('set', 'split')].values[0])
 
             if (count % 100 == 0):
                 print("Finished step %s." % count)
         except:
             print("Could not process track id %s because of a runtime error."
                   % tr_id)
-            continue
+            continuehints to annotate a function that returns an Iterable that always yields two values: a
 
     genres = np.array(genres)
 
