@@ -21,6 +21,12 @@ def create_mp3_objects(audio_dir: str, genre_df: pd.DataFrame) -> List[MP3]:
     * split_label, with type str. This column should only have
       "training", "validation", or "test" values.
     """
+
+    # if 'split_label' feature is not provided (e.g. custom
+    # splitting is desired), this will give every MP3 a blank splitting label.
+    if "split_label" not in genre_df.columns:
+        genre_df["split_label"] = ''
+
     mp3_list = []
 
     for path, dirnames, files in os.walk(audio_dir):
@@ -30,9 +36,11 @@ def create_mp3_objects(audio_dir: str, genre_df: pd.DataFrame) -> List[MP3]:
                     MP3(
                         os.path.join(path, file),
                         genre_df.loc[
-                            genre_df['track_id'] == int(file[:-4].lstrip('0')), 'genre'].values[0],
+                            genre_df['track_id'] == int(file[:-4].lstrip('0')),
+                            'genre'].values[0],
                         genre_df.loc[
-                            genre_df['track_id'] == int(file[:-4].lstrip('0')), 'split_label'].values[0],
+                            genre_df['track_id'] == int(file[:-4].lstrip('0')),
+                            'split_label'].values[0],
                     )
                 )
     return mp3_list
