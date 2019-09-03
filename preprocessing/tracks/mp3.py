@@ -10,9 +10,10 @@ import os
 
 class MP3():
 
-    def __init__(self, path: str, genre: str) -> None:
+    def __init__(self, path: str, genre: str, split_label: str) -> None:
         self.path = path
         self.genre = genre
+        self.split_label = split_label
 
     def track_id(self) -> str:
         return os.path.split(self.path)[1][:-4]

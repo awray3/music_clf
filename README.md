@@ -32,7 +32,8 @@ If you wish to use the FMA dataset for these models, follow these additional ste
 - [ ] Get `preprocessing.py` working 
 - [ ] Modify `convert.py` to work with an arbitrary list of `MP3` objects.
 	- [x] Works with lists of mp3 objects
-	- [ ] include a `split_label` attribute in MP3 class.
+	- [x] include a `split_label` attribute in MP3 class.
+	- [ ] finish modifying the `convert.py` script.
 - [ ] Write descriptions
 	- [ ] for `preprocessing` library
 	- [ ] for models
