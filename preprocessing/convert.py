@@ -6,10 +6,10 @@ for training.
 # I added a comment right here!
 
 from librosa import load
-from typing import List, Set
+from typing import List, Set, Tuple
 import numpy as np
+from audioread.exceptions import NoBackendError
 
-from preprocessing.tracks.paths import get_audio_path
 from preprocessing.tracks.mp3 import MP3
 
 
@@ -27,22 +27,30 @@ def unique_shapes(X: List[np.array]) -> Set[int]:
 
 def prepare_mp3s_and_labels(mp3_list: List[MP3],
                             sr: int=22050,
-                            split_option: str=False) -> Tuple[np.array, np.array, List[str]]:
-    if split_option:
-        split_labels = []
-
-    genre = []
+                            duration: float=5.0
+                            ) -> Tuple[np.array, np.array, List[str]]:
+    """
+    Takes a list of MP3 objects and imports them as numpy arrays with
+    the specified sample rate (kHz) and duration (seconds).
+    Returns:
+        * numpy array of sources, with shape
+        (len(mp3_list), 1, sr * duration)
+        * genre array containing the genre info
+        * split_label array containing split information
+    """
+    sources = np.empty((len(mp3_list), 1, int(sr * duration)))
+    genres = list()
+    split_labels = list()
     count = 0
     num_unprocessed = 0
-    sources = np.empty((len(mp3_list), 1, sr))
-    
+
     for mp3 in mp3_list:
         try:
             count += 1
             src, sr = load(mp3.path, sr=sr, mono=True)
 
             # trims the src file to be the correct length
-            src = src[:int(sr * len_second)]
+            src = src[:int(sr * duration)]
 
             # adds a new axis to tell the Kapre mel_spectrogram
             # layer that the mp3 is in mono format.
@@ -51,33 +59,25 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
             # add in this source to the sources array
             sources[count - 1, :, :] = src[:, :]
 
-            # append the genre from metadata
-            # genres.append(
-            #     meta_df.loc[meta_df['track_id'] == tr_id,
-            #                 ('track', 'genre_top')].values[0])
+            # append the genre
+            genres.append(mp3.genre)
 
             # append train/valid/test splitting labels
-            if split_option:
-                split_labels.append(
-                    meta_df.loc[meta_df['track_id'] == tr_id,
-                                ('set', 'split')].values[0])
+            split_labels.append(mp3.split_label)
 
             if (count % 100 == 0):
                 print("Finished step %s." % count)
-        except:
+        except (RuntimeError, NoBackendError):
+            num_unprocessed += 1
             print("Could not process track id %s because of a runtime error."
-                  % tr_id)
-            continuehints to annotate a function that returns an Iterable that always yields two values: a
+                  % mp3.track_id())
 
     genres = np.array(genres)
+    split_labels = np.array(split_labels)
 
-    # trim the songs so that they can be put into a numpy array.
-    shapes = unique_shapes(sources)
-    min_song_len = min(shapes)
-    for idx in range(len(sources)):
-        sources[idx] = sources[idx][:, :min_song_len]
+    print("Number of files that could not be processed: %s" % num_unprocessed)
 
-    return np.stack(sources), genres, split_labels
+    return sources, genres, split_labels
 
 
 def convert_and_save(audio_dir, track_ids, df, filename):
