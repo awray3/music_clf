@@ -1,6 +1,6 @@
 import os
 
-from preprocessing.tools.fma_metadata import get_fma_csv
+from preprocessing.fma_metadata import get_fma_csv
 
 meta_dir = os.path.join('data', 'fma_metadata')
 meta_fp = os.path.join(meta_dir, 'tracks.csv')
