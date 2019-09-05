@@ -19,11 +19,17 @@ def get_fma_csv(meta_dir: str, fma_size: str) -> pd.DataFrame:
 
     keep_cols = [('track', 'genre_top'), ('set', 'split')]
 
-    # slice out genre and split label
-    df = tracks.loc[
-        tracks[('set', 'subset')] == fma_size,
-        keep_cols
-    ]
+    # slice out genre and split label 
+    if fma_size == 'small':
+        df = tracks.loc[
+            tracks[('set', 'subset')] == fma_size,
+            keep_cols
+        ]
+    elif fma_size == 'medium':
+        df = tracks.loc[
+            tracks[('set', 'subset')].isin(['small', 'medium']),
+            keep_cols
+        ]
 
     # create track_id from the index
     df.reset_index(inplace=True)
