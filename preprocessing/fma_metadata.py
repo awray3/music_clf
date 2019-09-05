@@ -12,7 +12,7 @@ def get_fma_csv(meta_dir: str, fma_size: str) -> pd.DataFrame:
     fma_size - "small" or "medium". "large" and "full" not implemented
     """
 
-    if fma_size != 'small' and 'fma_size' != 'medium':
+    if fma_size != 'small' and fma_size != 'medium':
         raise NotImplementedError
 
     tracks = pd.read_csv(meta_dir, index_col=0, header=[0, 1])
