@@ -51,8 +51,13 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
 
         except (RuntimeError, NoBackendError):
             num_unprocessed += 1
-            print("Could not process track id %s because of a runtime error."
+            print("Could not process track id %s because of a runtime error or a corrupt audio file."
                   % mp3.track_id())
+        except ValueError:
+            num_unprocessed += 1
+            print("Track id " + mp3.track_id() + " appears to be shorter than the selected duration of %s seconds. Skipping track.")
+            print(load(mp3.path, sr=sr, duration=duration, mono=True)[0].shape)
+
 
     genres = np.array(genres)
     split_labels = np.array(split_labels)
