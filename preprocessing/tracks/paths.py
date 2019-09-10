@@ -44,33 +44,3 @@ def create_mp3_objects(audio_dir: str, genre_df: pd.DataFrame) -> List[MP3]:
                     )
                 )
     return mp3_list
-
-# -----------------------------------------------------------------
-
-# def track_id_from_directory(audio_dir):
-#     """
-#     Loops through the given directory and extracts the track ids.
-#     Returns a list of track ids.
-#     """
-#     track_ids = []
-#     for _, dirnames, files in os.walk(audio_dir):
-#         if dirnames == []:
-#             print('_')
-#             # strip off the file extension '.mp3'
-#             # track_ids.extend(int(file[:-4]) for file in files)
-#     return track_ids
-
-
-# def get_audio_path(audio_dir, track_id):
-#     """
-#     Return the path to the mp3 given the directory where the audio
-#     is stored and the track ID.
-#     Examples
-#     --------
-#     >>> import utils
-#     >>> small_audio_dir = os.environ.get('fma_small')
-#     >>> utils.get_audio_path(AUDIO_DIR, 2)
-#     '../data/fma_small/000/000002.mp3'
-#     """
-#     track_id_str = '{:06d}'.format(track_id)
-#     return os.path.join(audio_dir, track_id_str[:3], track_id_str + '.mp3')
