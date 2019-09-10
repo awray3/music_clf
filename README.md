@@ -3,8 +3,8 @@ Preprocessing and deep learning models for music genre classification.
 
 # Disclaimer
 
-This project is a work-in-progress. My code is being updated when possible, so the 
-instructions below may not be quite up to speed yet. 
+This project is a work-in-progress. My code is being updated when possible, so the
+instructions below may not be quite up to speed yet.
 
 ## Description
 
@@ -36,21 +36,23 @@ If you wish to use the FMA dataset for these models, follow these additional ste
 ## Explanation of `Librosa.load()`
 
 The core of this project is in the `librosa` package. When we call `librosa.load()`, we can
-specify the duration with the option `duration=...`. 
-The output of this is a 1D numpy array which has length equal to `duration * sr`. 
+specify the duration with the option `duration=...`.
+The output of this is a 1D numpy array which has length equal to `duration * sr`.
 
 Let's take an example to understand this clearly. Suppose we keep the sample rate `sr = 22050`, which is a sampling rate of 22kHz (which I believe means the computer pulls a sample from the song at that frequency). Then, if we set `duration=5.0`, this will take a 5 second duration of the song and will produce a numpy array of length `22050 * 5 = 110,250`.
 
 
 # To-Do
 
-- [ ] Get `preprocessing.py` working 
-- [ ] Modify `convert.py` to work with an arbitrary list of `MP3` objects.
+- [x] Modify `convert.py` to work with an arbitrary list of `MP3` objects.
 	- [x] Works with lists of mp3 objects
 	- [x] include a `split_label` attribute in MP3 class
 	- [x] finish modifying the `convert.py` script
-	- [ ] implement specific exception classes
-	- [ ] trim resulting numpy array in case of unreadable mp3s
+	- [x] implement specific exception classes
+	- [x] trim resulting numpy array in case of unreadable mp3s
+    - [x] speed up loading of mp3s (got around 20x faster!!!)
+- [ ] Get `preprocessing.py` working
+    - [ ] write logic to handle larger (>~ 5000 point) datasets
 - [ ] Write descriptions
 	- [ ] for `preprocessing` library
 	- [ ] for models
