@@ -39,7 +39,7 @@ The core of this project is in the `librosa` package. When we call `librosa.load
 specify the duration with the option `duration=...`.
 The output of this is a 1D numpy array which has length equal to `duration * sr`.
 
-Let's take an example to understand this clearly. Suppose we keep the sample rate `sr = 22050`, which is a sampling rate of 22kHz (which I believe means the computer pulls a sample from the song at that frequency). Then, if we set `duration=5.0`, this will take a 5 second duration of the song and will produce a numpy array of length `22050 * 5 = 110,250`.
+Let's take an example to understand this clearly. Suppose we keep the sample rate `sr = 22050`, which is a sampling rate of 22kHz (meaning the computer pulls a sample from the song 22 thousand times per second). Then, if we set `duration=5.0`, this will take a 5 second duration of the song and will produce a numpy array of length `22050 * 5 = 110,250`.
 
 
 # To-Do
