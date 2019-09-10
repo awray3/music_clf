@@ -13,18 +13,6 @@ from audioread.exceptions import NoBackendError
 from preprocessing.tracks.mp3 import MP3
 
 
-def unique_shapes(X: List[np.array]) -> Set[int]:
-    """
-    Takes a list of numpy arrays, X, and compiles the shapes of the
-    components. To be used inside the `prepare_mp3s_and_lables` function
-    to get all of the shapes of loaded mp3 files.
-    """
-    shapes = set([])
-    for arr in X:
-        shapes.add(arr.shape[1])
-    return shapes
-
-
 def prepare_mp3s_and_labels(mp3_list: List[MP3],
                             sr: int=22050,
                             duration: float=5.0
@@ -34,30 +22,26 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
     the specified sample rate (kHz) and duration (seconds).
     Returns:
         * numpy array of sources, with shape
-        (len(mp3_list), 1, sr * duration)
+            (len(mp3_list), 1, sr * duration)
         * genre array containing the genre info
         * split_label array containing split information
     """
+
+    num_mp3s = len(mp3_list)
+    num_unprocessed = 0
+    count = 0
+
     sources = np.empty((len(mp3_list), 1, int(sr * duration)))
     genres = list()
     split_labels = list()
-    count = 0
-    num_unprocessed = 0
+
+    print("Number of mp3s: %s" % num_mp3s)
 
     for mp3 in mp3_list:
+        print('Processing track ' + mp3.track_id() + '.', end='\r')
         try:
             count += 1
-            src, sr = load(mp3.path, sr=sr, mono=True)
-
-            # trims the src file to be the correct length
-            src = src[:int(sr * duration)]
-
-            # adds a new axis to tell the Kapre mel_spectrogram
-            # layer that the mp3 is in mono format.
-            src = src[np.newaxis, :]
-
-            # add in this source to the sources array
-            sources[count - 1, :, :] = src[:, :]
+            sources[count-1, 0, :], _ = load(mp3.path, sr=sr, duration=duration, mono=True)
 
             # append the genre
             genres.append(mp3.genre)
@@ -65,8 +49,6 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
             # append train/valid/test splitting labels
             split_labels.append(mp3.split_label)
 
-            if (count % 100 == 0):
-                print("Finished step %s." % count)
         except (RuntimeError, NoBackendError):
             num_unprocessed += 1
             print("Could not process track id %s because of a runtime error."
@@ -75,9 +57,17 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
     genres = np.array(genres)
     split_labels = np.array(split_labels)
 
+    # trim the sources array if some mp3s fail to load.
+    if num_unprocessed > 0:
+        sources = np.delete(sources, np.s_[-num_unprocessed:], 0)
+
+    print("shape of sources array: ", sources.shape)
+
     print("Number of files that could not be processed: %s" % num_unprocessed)
 
     return sources, genres, split_labels
+
+
 
 
 def convert_and_save(audio_dir, track_ids, df, filename):
