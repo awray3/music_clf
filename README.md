@@ -1,4 +1,4 @@
-# music_clf
+# Music CLF
 Preprocessing and deep learning models for music genre classification.
 
 # Disclaimer
