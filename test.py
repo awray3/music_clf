@@ -1,5 +1,8 @@
-import pandas as pd
+"""
+Main script for testing preprocessing module.
+"""
 import os
+import pandas as pd
 
 from preprocessing.tracks.paths import create_mp3_objects
 from preprocessing.convert import prepare_mp3s_and_labels
