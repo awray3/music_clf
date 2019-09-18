@@ -5,17 +5,18 @@ for training.
 
 # I added a comment right here!
 
-from librosa import load
-from typing import List, Set, Tuple
+from typing import List, Tuple
+
 import numpy as np
 from audioread.exceptions import NoBackendError
+from librosa import load
 
 from preprocessing.tracks.mp3 import MP3
 
 
 def prepare_mp3s_and_labels(mp3_list: List[MP3],
-                            sr: int=22050,
-                            duration: float=5.0
+                            sr: int = 22050,
+                            duration: float = 5.0
                             ) -> Tuple[np.array, np.array, List[str]]:
     """
     Takes a list of MP3 objects and imports them as numpy arrays with
@@ -41,7 +42,10 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
         print('Processing track ' + mp3.track_id() + '.', end='\r')
         try:
             count += 1
-            sources[count-1, 0, :], _ = load(mp3.path, sr=sr, duration=duration, mono=True)
+            sources[count - 1, 0, :], _ = load(mp3.path,
+                                               sr=sr,
+                                               duration=duration,
+                                               mono=True)
 
             # append the genre
             genres.append(mp3.genre)
@@ -51,13 +55,16 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
 
         except (RuntimeError, NoBackendError):
             num_unprocessed += 1
-            print("Could not process track id %s because of a runtime error or a corrupt audio file."
-                  % mp3.track_id())
+            print(
+                "Could not process track id %s because of a runtime error or a corrupt audio file."
+                % mp3.track_id())
         except ValueError:
             num_unprocessed += 1
-            print("Track id " + mp3.track_id() + " appears to be shorter than the selected duration of %s seconds. Skipping track.")
+            print(
+                "Track id " + mp3.track_id() +
+                " appears to be shorter than the selected duration of %s seconds. Skipping track."
+                % duration)
             print(load(mp3.path, sr=sr, duration=duration, mono=True)[0].shape)
-
 
     genres = np.array(genres)
     split_labels = np.array(split_labels)
@@ -73,16 +80,13 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
     return sources, genres, split_labels
 
 
-
-
 def convert_and_save(audio_dir, track_ids, df, filename):
     """
     Boiler plate for running `prepare_mp3s_and_labels`.
     Frees up memory after processing.
     """
     X, y, split_labels = prepare_mp3s_and_labels(audio_dir, track_ids, df)
-    np.savez(
-        filename + '.npz', X, y, split_labels)
+    np.savez(filename + '.npz', X, y, split_labels)
 
     # delete after saving to free up memory
     del X
