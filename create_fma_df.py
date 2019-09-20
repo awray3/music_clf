@@ -12,4 +12,4 @@ if fma_size != 'small' and fma_size != 'medium':
 
 df = get_fma_csv(meta_fp, fma_size)
 
-df.to_csv(os.path.join(meta_dir, fma_size + '_track_info.csv'))
+df.to_csv(os.path.join(meta_dir, fma_size + '_track_info.csv'), index=False)
