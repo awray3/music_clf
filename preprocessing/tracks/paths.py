@@ -32,15 +32,22 @@ def create_mp3_objects(audio_dir: str, genre_df: pd.DataFrame) -> List[MP3]:
     for path, dirnames, files in os.walk(audio_dir):
         for file in files:
             if dirnames == []:
-                mp3_list.append(
-                    MP3(
-                        os.path.join(path, file),
-                        genre_df.loc[
-                            genre_df['track_id'] == int(file[:-4].lstrip('0')),
-                            'genre'].values[0],
-                        genre_df.loc[
-                            genre_df['track_id'] == int(file[:-4].lstrip('0')),
-                            'split_label'].values[0],
+                try:
+                    mp3_list.append(
+                        MP3(
+                            os.path.join(path, file),
+                            genre_df.loc[
+                                genre_df['track_id'] == int(file[:-4].lstrip('0')),
+                                'genre'].values[0],
+                            genre_df.loc[
+                                genre_df['track_id'] == int(file[:-4].lstrip('0')),
+                                'split_label'].values[0],
+                        )
                     )
-                )
+                except IndexError:
+                    """
+                    This error most likely occurs because an mp3
+                    without metadata shows up.
+                    """
+                    continue
     return mp3_list

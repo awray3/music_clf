@@ -58,6 +58,7 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
             print(
                 "Could not process track id %s because of a runtime error or a corrupt audio file."
                 % mp3.track_id())
+            print(f"number processed: {count+num_unprocessed}")
         except ValueError:
             num_unprocessed += 1
             print(
@@ -80,11 +81,16 @@ def prepare_mp3s_and_labels(mp3_list: List[MP3],
     return sources, genres, split_labels
 
 
-def convert_and_save(audio_dir, track_ids, df, filename):
+def convert_and_save(mp3_list: List[MP3],
+                     sr: int = 22050,
+                     duration: float = 5.0,
+                     chunk_size: int = 5000):
     """
     Boiler plate for running `prepare_mp3s_and_labels`.
     Frees up memory after processing.
     """
+    num_chunks = int(np.ceil(len(mp3_list) / 5000.0))
+
     X, y, split_labels = prepare_mp3s_and_labels(audio_dir, track_ids, df)
     np.savez(filename + '.npz', X, y, split_labels)
 
