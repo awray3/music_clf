@@ -9,7 +9,7 @@ from preprocessing.tracks.paths import create_mp3_objects
 from preprocessing.convert import prepare_mp3s_and_labels
 
 print("Loading metadata.")
-meta_fp = os.path.join('data', 'fma_metadata', 'small_track_info.csv')
+meta_fp = os.path.join('data', 'fma_metadata', 'medium_track_info.csv')
 
 # subdir = str(input('Enter 3-digit subdir: '))
 # subdir = '133'
