@@ -2,7 +2,6 @@
 The dataset class used to load mp3 data.
 """
 import os
-import pandas as pd
 
 from torch.utils.data import Dataset
 import torch
@@ -11,7 +10,7 @@ import torchaudio
 class Mp3Dataset(Dataset):
     """
     The dataset class used to load mp3 data.
-    Specify train/validation/test splits by altering the input 
+    Specify train/validation/test splits by altering the input
     for df.
     """
 
