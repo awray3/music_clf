@@ -48,6 +48,9 @@ class Mp3Dataset(Dataset):
         # convert to melspec
         melspec = torchaudio.transforms.MelSpectrogram()(waveform)
 
+        # transpose the last two coordinates so that time is interpreted
+        # as channels
+        melspec = melspec.permute(0, 2, 1)
         # return waveform
         return melspec, genre
 
@@ -58,4 +61,3 @@ class Mp3Dataset(Dataset):
         track_id = ID.zfill(6)
 
         return os.path.join(self.audio_path, track_id[:3], track_id + '.mp3')
-
