@@ -45,9 +45,10 @@ validation_generator = data.DataLoader(validation_set, **params)
 test_set = Mp3Dataset(test_df, audio_path, 1.0)
 test_generator = data.DataLoader(test_set, **params)
 
+# Testing ground
+print(training_set[0][0].size()) # (1, 81, 128) now!
 
 # Model stuff
 
 # close sox
-
 torchaudio.shutdown_sox()
