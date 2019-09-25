@@ -11,14 +11,15 @@ import torchaudio
 class Mp3Dataset(Dataset):
     """
     The dataset class used to load mp3 data.
+    Specify train/validation/test splits by altering the input 
+    for df.
     """
 
-    def __init__(self, csv_path, audio_path, duration):
+    def __init__(self, df, audio_path, duration):
 
-        metadata = pd.read_csv(csv_path)
         self.audio_path = audio_path
-        self.IDs = metadata.track_id.astype(str).to_list()
-        self.genre_list = metadata.genre.to_list()
+        self.IDs = df.track_id.astype(str).to_list()
+        self.genre_list = df.genre.to_list()
         self.duration = duration
 
         # create the chain of preprocessing
