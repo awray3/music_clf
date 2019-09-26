@@ -7,6 +7,15 @@ from torch.utils.data import Dataset
 import torch
 import torchaudio
 
+
+sr = 22050
+
+n_mels = 64
+fft_window_pts = 512
+fft_window_dur = fft_window_points * 1.0 / sr # 23 ms window length
+hop_size = fft_window_pts // 2 # 50% overlap between consecutive frames
+
+
 class Mp3Dataset(Dataset):
     """
     The dataset class used to load mp3 data.
@@ -24,7 +33,7 @@ class Mp3Dataset(Dataset):
         # create the chain of preprocessing
         self.E = torchaudio.sox_effects.SoxEffectsChain()
         self.E.append_effect_to_chain("trim", [0, self.duration])
-        self.E.append_effect_to_chain("rate", [16000])
+        self.E.append_effect_to_chain("rate", [sr])
         self.E.append_effect_to_chain("channels", ["1"])
 
     def __len__(self):
@@ -40,17 +49,20 @@ class Mp3Dataset(Dataset):
         waveform, _ = self.E.sox_build_flow_effects() # size: [1, len * sr]
 
         # padding in case the waveform is too short
-        if waveform.size()[1] < self.duration * 16000:
+        if waveform.size()[1] < self.duration * sr:
             # on small: only 98567 does this.
-            new_waveform = torch.zeros(1, int(self.duration * 16000))
+            new_waveform = torch.zeros(1, int(self.duration * sr))
             new_waveform[:, :waveform.size()[1]] = waveform
             waveform = new_waveform
         # convert to melspec
-        melspec = torchaudio.transforms.MelSpectrogram()(waveform)
+        melspec = torchaudio.transforms.MelSpectrogram(
+            sample_rate=sr,
+            n_fft=fft_window_pts,
+            hop_length=hop_size)(waveform)
 
         # transpose the last two coordinates so that time is interpreted
         # as channels
-        melspec = melspec.permute(0, 2, 1)
+        # melspec = melspec.permute(0, 2, 1)
         # return waveform
         return melspec, genre
 
