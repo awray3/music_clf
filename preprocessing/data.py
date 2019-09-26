@@ -58,7 +58,8 @@ class Mp3Dataset(Dataset):
         melspec = torchaudio.transforms.MelSpectrogram(
             sample_rate=sr,
             n_fft=fft_window_pts,
-            hop_length=hop_size)(waveform)
+            hop_length=hop_size,
+            n_mels=n_mels)(waveform)
 
         # transpose the last two coordinates so that time is interpreted
         # as channels
