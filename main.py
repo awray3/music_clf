@@ -14,6 +14,7 @@ from preprocessing.data import Mp3Dataset
 fma_size = 'small'
 meta_path = 'data/fma_metadata/small_track_info.csv'
 audio_path = 'data/fma_' + fma_size
+duration = 1.0 # 1 second long spectrograms
 
 # create the metadata csv if not already made
 if not os.path.isfile(meta_path):
