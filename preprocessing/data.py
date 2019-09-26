@@ -12,7 +12,7 @@ sr = 22050
 
 n_mels = 64
 fft_window_pts = 512
-fft_window_dur = fft_window_points * 1.0 / sr # 23 ms window length
+fft_window_dur = fft_window_pts * 1.0 / sr # 23 ms window length
 hop_size = fft_window_pts // 2 # 50% overlap between consecutive frames
 
 
