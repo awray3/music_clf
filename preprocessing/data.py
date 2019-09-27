@@ -44,7 +44,8 @@ class Mp3Dataset(Dataset):
 
     def __getitem__(self, index):
         ID = self.IDs[index]
-        genre = self.one_hot(self.genre_list[index])
+        # genre = self.one_hot(self.genre_list[index])
+        genre = self.genre_dict[self.genre_list[index]]
 
         self.E.set_input_file(self.get_path_from_ID(ID))
 
@@ -81,6 +82,6 @@ class Mp3Dataset(Dataset):
         """
         takes a genre string and returns its one-hot vector representation.
         """
-        z = torch.zeros(len(set(self.genre_list)))
+        z = torch.zeros(len(set(self.genre_list)), dtype=torch.long)
         z[self.genre_dict[genre]] = 1
         return z
