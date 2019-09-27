@@ -3,13 +3,13 @@ Main script for training the models.
 """
 import os
 import torch
-from torch.utils import data
 import torchaudio
 import pandas as pd
 import numpy as np
 
 from preprocessing.create_fma_df import create_csv
 from preprocessing.data import Mp3Dataset
+from models import Baseline_cnn
 
 fma_size = 'small'
 meta_path = 'data/fma_metadata/small_track_info.csv'
@@ -29,27 +29,59 @@ train_df, valid_df, test_df = np.split(
         [int(.6*len(meta_df)), int(.8*len(meta_df))])
 
 # parameters
-params = {'batch_size': 8,
+params = {'batch_size': 4,
           'shuffle': True,
-          'num_workers': 4}
+          'num_workers': 0}
 
 # turn on sox
 torchaudio.initialize_sox()
 
 # Data generators
 training_set = Mp3Dataset(train_df, audio_path, 1.0)
-training_generator = data.DataLoader(training_set, **params)
+training_generator = torch.utils.data.DataLoader(training_set, **params)
 
-validation_set = Mp3Dataset(valid_df, audio_path, 1.0)
-validation_generator = data.DataLoader(validation_set, **params)
 
-test_set = Mp3Dataset(test_df, audio_path, 1.0)
-test_generator = data.DataLoader(test_set, **params)
+# with torch.no_grad():
+    # batch_mel, batch_genre = next(iter(training_generator))
+    # print(batch_mel.size())
+    # # print(batch_genre)
 
-# Testing ground
-print(training_set[0][0].size()) # (1, 81, 128) now!
+    # outputs = model(batch_mel)
+    # print(outputs)
+    # print(batch_genre)
+    # print(outputs.size())
+
+
+# validation_set = Mp3Dataset(valid_df, audio_path, 1.0)
+# validation_generator = data.DataLoader(validation_set, **params)
+
+# test_set = Mp3Dataset(test_df, audio_path, 1.0)
+# test_generator = data.DataLoader(test_set, **params)
+
 
 # Model stuff
+
+# create model instance
+model = Baseline_cnn()
+
+loss_fn = torch.nn.CrossEntropyLoss()
+
+learning_rate = 1e-2
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+# two epochs for now
+for t in range(2):
+    for batch_mel, batch_labels in iter(training_generator):
+
+        # forward pass:
+        pred_labels = model(batch_mel)
+
+        # calculate loss
+        loss = loss_fn(pred_labels, batch_labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    print(loss)
 
 # close sox
 torchaudio.shutdown_sox()
