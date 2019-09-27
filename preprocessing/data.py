@@ -28,6 +28,8 @@ class Mp3Dataset(Dataset):
         self.audio_path = audio_path
         self.IDs = df.track_id.astype(str).to_list()
         self.genre_list = df.genre.to_list()
+        self.genre_dict = dict(zip(set(self.genre_list),
+                                   range(len(set(self.genre_list)))))
         self.duration = duration
 
         # create the chain of preprocessing
@@ -42,7 +44,7 @@ class Mp3Dataset(Dataset):
 
     def __getitem__(self, index):
         ID = self.IDs[index]
-        genre = self.genre_list[index]
+        genre = self.one_hot(self.genre_list[index])
 
         self.E.set_input_file(self.get_path_from_ID(ID))
 
@@ -74,3 +76,8 @@ class Mp3Dataset(Dataset):
         track_id = ID.zfill(6)
 
         return os.path.join(self.audio_path, track_id[:3], track_id + '.mp3')
+
+    def one_hot(self, genre):
+        z = torch.zeros(len(set(self.genre_list)))
+        z[self.genre_dict[genre]] = 1
+        return z
