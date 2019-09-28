@@ -78,10 +78,3 @@ class Mp3Dataset(Dataset):
 
         return os.path.join(self.audio_path, track_id[:3], track_id + '.mp3')
 
-    def one_hot(self, genre):
-        """
-        takes a genre string and returns its one-hot vector representation.
-        """
-        z = torch.zeros(len(set(self.genre_list)), dtype=torch.long)
-        z[self.genre_dict[genre]] = 1
-        return z
