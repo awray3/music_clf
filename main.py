@@ -66,10 +66,10 @@ learning_rate = 1e-2
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # # two epochs for now
+i = 1
 for t in range(2):
     for batch_mel, batch_labels in iter(training_generator):
 
-        print('Starting forward pass', end='\r')
         # # forward pass:
         pred_labels = model(batch_mel)
 
@@ -77,9 +77,10 @@ for t in range(2):
         loss = loss_fn(pred_labels, batch_labels)
         optimizer.zero_grad()
 
-        print('backpropagating.', end='\r')
         loss.backward()
         optimizer.step()
+        print(f'Finished step {i} of {6400//16}.', end='\r')
+        i += 1
     print(loss)
 
 
