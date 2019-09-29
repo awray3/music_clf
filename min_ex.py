@@ -7,6 +7,7 @@ import pandas as pd
 
 sr = 22050
 
+
 class Mp3Dataset(Dataset):
     """
     Mp3 dataset class to work with the FMA dataset.
@@ -55,6 +56,7 @@ class Mp3Dataset(Dataset):
 
         return os.path.join(self.audio_path, track_id[:3], track_id + '.mp3')
 
+
 if __name__ == '__main__':
 
     # my path to audio files
@@ -67,7 +69,7 @@ if __name__ == '__main__':
 
     dataset = Mp3Dataset(df, audio_path, 1.0)
 
-    params = {'batch_size': 8, 'shuffle': True, 'num_workers': 2}
+    params = {'batch_size': 8, 'shuffle': True, 'num_workers': 0}
 
     dataset_loader = data.DataLoader(dataset, **params)
 
