@@ -1,51 +1,34 @@
-import pandas as pd
+"""
+Main script for testing preprocessing module.
+"""
 import os
-from typing import List
+from time import time
+import pandas as pd
 
-from preprocessing.convert import convert_and_save
-from preprocessing.tracks.paths import track_id_from_directory
-from preprocessing.tracks.mp3 import MP3
 from preprocessing.tracks.paths import create_mp3_objects
+from preprocessing.convert import prepare_mp3s_and_labels
 
-print("""
-Welcome to my FMA preprocessing module.
+print("Loading metadata.")
+meta_fp = os.path.join('data', 'fma_metadata', 'small_track_info.csv')
 
-* Please run create_fma_df.py first to create an mp3 metadata dataframe.
-""")
+# subdir = str(input('Enter 3-digit subdir: '))
+# subdir = '133'
+# subdir = '054'
+# audio_dir = os.path.join('data', 'fma_small', subdir)
+audio_dir = os.path.join('data', 'fma_small')
 
+df = pd.read_csv(meta_fp, index_col=0)
 
-def preprocess(audio_dir: str, fma_size: str, mp3_list: List[MP3]) -> None:
-    """
-    Main function for running the preprocessing step.
-    Takes in the audio directory and a list of MP3 objects
-    and produces a .npz file for training.
-    """
-    """
-    FMA-Small Dataset
-    """
-    if fma_size == 'small':
-        print('You have selected to preprocess the small version.')
+# 080391
+# df.drop(df.loc[df['track_id'] == 80391, :].index, axis=0, inplace=True)
+# hopefully the issue won't happen until the "mass issue"
+# print(df.head())
 
-        print('Beginning conversion of mp3s...')
-        convert_and_save(audio_dir_small, small_track_ids, df_small,
-                         os.path.join('..', 'small_processed_arr'))
-        print('... done.')
-    """
-    FMA-Medium Dataset
-    """
-    if fma_size == 'medium':
-        print('You have selected to preprocess the medium version.')
+mp3_list = create_mp3_objects(audio_dir, df)
+print("Finished creating the mp3 objects.", "Beginning Librosa loading.")
+t1 = time()
+X, y, split_labels = prepare_mp3s_and_labels(mp3_list, duration=1.0)
 
-        med_track_ids = track_id_from_directory(audio_dir_med)
+t2 = time()
 
-        chunkSize = 5000
-
-        # convert and save the dataset in chunks.
-        for i in range(5):
-            convert_and_save(audio_dir_med,
-                             med_track_ids[i * chunkSize:(i + 1) * chunkSize],
-                             df_med, 'med_processed_arr_' + str(i + 1))
-
-
-preprocess('small')
-# preprocess(input('Select Size (small/med) for preprocessing: '))
+print(f"Completed preprocessing in {t2-t1}")
