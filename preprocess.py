@@ -7,28 +7,40 @@ import pandas as pd
 
 from preprocessing.tracks.paths import create_mp3_objects
 from preprocessing.convert import prepare_mp3s_and_labels
+from create_fma_df import create_fma_df 
 
-print("Loading metadata.")
-meta_fp = os.path.join('data', 'fma_metadata', 'small_track_info.csv')
+    
 
-# subdir = str(input('Enter 3-digit subdir: '))
-# subdir = '133'
-# subdir = '054'
-# audio_dir = os.path.join('data', 'fma_small', subdir)
-audio_dir = os.path.join('data', 'fma_small')
+def run_preprocessing(fma_option: str):
 
-df = pd.read_csv(meta_fp, index_col=0)
+    print("Loading metadata.")
 
-# 080391
-# df.drop(df.loc[df['track_id'] == 80391, :].index, axis=0, inplace=True)
-# hopefully the issue won't happen until the "mass issue"
-# print(df.head())
+    meta_dir = os.path.join('data', 'fma_metadata')
+    meta_fp = os.path.join(meta_dir, fma_option + '_track_info.csv')
 
-mp3_list = create_mp3_objects(audio_dir, df)
-print("Finished creating the mp3 objects.", "Beginning Librosa loading.")
-t1 = time()
-X, y, split_labels = prepare_mp3s_and_labels(mp3_list, duration=1.0)
+    if not os.exists(meta_fp):
+        create_fma_df(meta_dir, meta_fp, fma_option)
 
-t2 = time()
+    audio_dir = os.path.join('data', 'fma_' + fma_option)
 
-print(f"Completed preprocessing in {t2-t1}")
+    df = pd.read_csv(meta_fp, index_col=0)
+
+    mp3_list = create_mp3_objects(audio_dir, df)
+    print("Finished creating the mp3 objects.", "Beginning Librosa loading.")
+
+    t1 = time()
+
+    X, y, split_labels = prepare_mp3s_and_labels(mp3_list, duration=1.0)
+
+    t2 = time()
+
+    print(f"Completed preprocessing in {t2-t1} seconds.")
+
+if __name == '__main__':
+
+    fma_option = input('Preprocess FMA size small or medium? :')
+
+    if fma_option not in ['small', 'medium']:
+        raise ValueError('Please select small or medium.')
+
+    run_preprocessing(fma_option)
