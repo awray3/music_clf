@@ -3,7 +3,8 @@ The dataset class used to load mp3 data.
 """
 import os
 
-from torch.utils.data import Dataset
+import pandas as pd
+import torch.utils.data as data 
 import torch
 import torchaudio
 
@@ -15,7 +16,7 @@ fft_window_dur = fft_window_pts * 1.0 / sr  # 23 ms window length
 hop_size = fft_window_pts // 2  # 50% overlap between consecutive frames
 
 
-class Mp3Dataset(Dataset):
+class Mp3Dataset(data.Dataset):
     """
     The dataset class used to load mp3 data.
     Specify train/validation/test splits by altering the input
@@ -51,12 +52,7 @@ class Mp3Dataset(Dataset):
 
         waveform, _ = self.E.sox_build_flow_effects()  # size: [1, len * sr]
 
-        # padding in case the waveform is too short
-        if waveform.size()[1] < self.duration * sr:
-            # on small: only 98567 does this.
-            new_waveform = torch.zeros(1, int(self.duration * sr))
-            new_waveform[:, :waveform.size()[1]] = waveform
-            waveform = new_waveform
+        # padding in  = new_waveform
         # convert to melspec
         melspec = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
                                                        n_fft=fft_window_pts,
@@ -96,3 +92,20 @@ class Mp3Dataset(Dataset):
                 print(ID)
 
             self.IDs = [ID for ID in self.IDs if ID not in files_not_found]
+
+
+if __name__ == '__main__':
+    audio_path = os.path.join('data', 'fma_small')
+    df = pd.read_csv('data/fma_metadata/small_track_info.csv')
+
+    torchaudio.initialize_sox()
+
+    dataset = Mp3Dataset(df, audio_path, 1.0)
+
+    params = {'batch_size': 8, 'shuffle': True, 'num_workers': 2}
+
+    dataset_loader = data.DataLoader(dataset, **params)
+
+    print(next(iter(dataset_loader)))
+
+    torchaudio.shutdown_sox()

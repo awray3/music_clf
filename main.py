@@ -30,7 +30,7 @@ train_df, valid_df, test_df = np.split(
     [int(.6 * len(meta_df)), int(.8 * len(meta_df))])
 
 # parameters
-params = {'batch_size': 16, 'shuffle': True, 'num_workers': 0}
+params = {'batch_size': 16, 'shuffle': True, 'num_workers': 2}
 
 # turn on sox
 torchaudio.initialize_sox()
@@ -39,11 +39,11 @@ torchaudio.initialize_sox()
 training_set = Mp3Dataset(train_df, audio_path, 1.0)
 training_generator = data.DataLoader(training_set, **params)
 
-validation_set = Mp3Dataset(valid_df, audio_path, 1.0)
-validation_generator = data.DataLoader(validation_set, **params)
+# validation_set = Mp3Dataset(valid_df, audio_path, 1.0)
+# validation_generator = data.DataLoader(validation_set, **params)
 
-test_set = Mp3Dataset(test_df, audio_path, 1.0)
-test_generator = data.DataLoader(test_set, **params)
+# test_set = Mp3Dataset(test_df, audio_path, 1.0)
+# test_generator = data.DataLoader(test_set, **params)
 
 # with torch.no_grad():
 # batch_mel, batch_genre = next(iter(training_generator))
@@ -58,30 +58,32 @@ test_generator = data.DataLoader(test_set, **params)
 # Model stuff
 
 # create model instance
-model = Baseline_cnn()
+# model = Baseline_cnn()
 
-loss_fn = torch.nn.CrossEntropyLoss()
+# loss_fn = torch.nn.CrossEntropyLoss()
 
-learning_rate = 1e-2
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+# learning_rate = 1e-2
+# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # # two epochs for now
-i = 1
-for t in range(2):
-    for batch_mel, batch_labels in iter(training_generator):
+# i = 1
+# for t in range(2):
+for idx, batch in enumerate(training_generator):
+    print(idx, batch)
 
-        # # forward pass:
-        pred_labels = model(batch_mel)
 
-        # # calculate loss
-        loss = loss_fn(pred_labels, batch_labels)
-        optimizer.zero_grad()
+        # # # forward pass:
+        # pred_labels = model(batch_mel)
 
-        loss.backward()
-        optimizer.step()
-        print(f'Finished step {i} of {6400//16}.', end='\r')
-        i += 1
-    print(loss)
+        # # # calculate loss
+        # loss = loss_fn(pred_labels, batch_labels)
+        # optimizer.zero_grad()
+
+        # loss.backward()
+        # optimizer.step()
+        # print(f'Finished step {i} of {6400//16}.', end='\r')
+        # i += 1
+    # print(loss)
 
 
 # close sox
