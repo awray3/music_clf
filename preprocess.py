@@ -11,14 +11,14 @@ from create_fma_df import create_fma_df
 
     
 
-def run_preprocessing(fma_option: str):
+def run_preprocessing(fma_option: str, duration=1.0):
 
     print("Loading metadata.")
 
     meta_dir = os.path.join('data', 'fma_metadata')
     meta_fp = os.path.join(meta_dir, fma_option + '_track_info.csv')
 
-    if not os.exists(meta_fp):
+    if not os.path.exists(meta_fp):
         create_fma_df(meta_dir, meta_fp, fma_option)
 
     audio_dir = os.path.join('data', 'fma_' + fma_option)
@@ -30,7 +30,7 @@ def run_preprocessing(fma_option: str):
 
     t1 = time()
 
-    X, y, split_labels = prepare_mp3s_and_labels(mp3_list, duration=1.0)
+    X, y, split_labels = prepare_mp3s_and_labels(mp3_list, duration=duration)
 
     t2 = time()
 
@@ -42,5 +42,7 @@ if __name == '__main__':
 
     if fma_option not in ['small', 'medium']:
         raise ValueError('Please select small or medium.')
+
+    duration = input('Enter float for duration in seconds (default 1.0): ')
 
     run_preprocessing(fma_option)
