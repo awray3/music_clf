@@ -2,6 +2,7 @@ import os
 
 from preprocessing.fma_metadata import get_fma_csv
 
+
 def create_csv(fma_size: str):
     meta_dir = os.path.join('data', 'fma_metadata')
     meta_fp = os.path.join(meta_dir, 'tracks.csv')
@@ -12,6 +13,7 @@ def create_csv(fma_size: str):
     df = get_fma_csv(meta_fp, fma_size)
 
     df.to_csv(os.path.join(meta_dir, fma_size + '_track_info.csv'), index=False)
+
 
 if __name__ == "__main__":
     fma_size = input('Select fma size (small or medium): ')

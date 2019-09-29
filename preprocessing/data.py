@@ -4,7 +4,7 @@ The dataset class used to load mp3 data.
 import os
 
 import pandas as pd
-import torch.utils.data as data 
+import torch.utils.data as data
 import torch
 import torchaudio
 
@@ -52,7 +52,11 @@ class Mp3Dataset(data.Dataset):
 
         waveform, _ = self.E.sox_build_flow_effects()  # size: [1, len * sr]
 
-        # padding in  = new_waveform
+        if waveform.size()[1] < self.duration * sr:
+            new_waveform = torch.zeros(1, int(self.duration * sr))
+            new_waveform[:, :waveform.size()[1]] = waveform
+            waveform = new_waveform
+
         # convert to melspec
         melspec = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
                                                        n_fft=fft_window_pts,

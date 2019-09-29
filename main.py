@@ -8,7 +8,7 @@ import torchaudio
 import pandas as pd
 import numpy as np
 
-from preprocessing.create_fma_df import create_csv
+from create_fma_df import create_csv
 from preprocessing.data import Mp3Dataset
 from models import Baseline_cnn
 
@@ -30,7 +30,7 @@ train_df, valid_df, test_df = np.split(
     [int(.6 * len(meta_df)), int(.8 * len(meta_df))])
 
 # parameters
-params = {'batch_size': 16, 'shuffle': True, 'num_workers': 2}
+params = {'batch_size': 16, 'shuffle': True, 'num_workers': 0}
 
 # turn on sox
 torchaudio.initialize_sox()
@@ -58,32 +58,29 @@ training_generator = data.DataLoader(training_set, **params)
 # Model stuff
 
 # create model instance
-# model = Baseline_cnn()
+model = Baseline_cnn()
 
-# loss_fn = torch.nn.CrossEntropyLoss()
+loss_fn = torch.nn.CrossEntropyLoss()
 
-# learning_rate = 1e-2
-# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+learning_rate = 1e-2
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # # two epochs for now
-# i = 1
-# for t in range(2):
-for idx, batch in enumerate(training_generator):
-    print(idx, batch)
-
-
+i = 1
+for t in range(2):
+    for batch_mel, batch_genre in training_generator:
         # # # forward pass:
-        # pred_labels = model(batch_mel)
+        pred_genre = model(batch_mel)
 
         # # # calculate loss
-        # loss = loss_fn(pred_labels, batch_labels)
-        # optimizer.zero_grad()
+        loss = loss_fn(pred_genre, batch_genre)
+        optimizer.zero_grad()
 
-        # loss.backward()
-        # optimizer.step()
-        # print(f'Finished step {i} of {6400//16}.', end='\r')
-        # i += 1
-    # print(loss)
+        loss.backward()
+        optimizer.step()
+        print(f'Finished step {i} of {6400//16}.', end='\r')
+        i += 1
+    print(loss)
 
 
 # close sox
