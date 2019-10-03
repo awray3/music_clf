@@ -38,6 +38,11 @@ class Mp3Dataset(data.Dataset):
         self.E.append_effect_to_chain("rate", [sr])
         self.E.append_effect_to_chain("channels", ["1"])
 
+        # melspec transform
+        self.melspecf = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
+                                                             n_fft=fft_window_pts,
+                                                             hop_length=hop_size,
+                                                             n_mels=n_mels)
         self.clean_IDs()
 
     def __len__(self):
@@ -45,12 +50,11 @@ class Mp3Dataset(data.Dataset):
 
     def __getitem__(self, index):
         ID = self.IDs[index]
-        # genre = self.one_hot(self.genre_list[index])
         genre = self.genre_dict[self.genre_list[index]]
 
         self.E.set_input_file(self.get_path_from_ID(ID))
 
-        waveform, _ = self.E.sox_build_flow_effects()  # size: [1, len * sr]
+        waveform, _ = self.E.sox_build_flow_effects()
 
         if waveform.size()[1] < self.duration * sr:
             new_waveform = torch.zeros(1, int(self.duration * sr))
@@ -58,10 +62,7 @@ class Mp3Dataset(data.Dataset):
             waveform = new_waveform
 
         # convert to melspec
-        melspec = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
-                                                       n_fft=fft_window_pts,
-                                                       hop_length=hop_size,
-                                                       n_mels=n_mels)(waveform)
+        melspec = self.melspecf(waveform).detach()
 
         # transpose the last two coordinates so that time is interpreted
         # as channels
@@ -90,7 +91,7 @@ class Mp3Dataset(data.Dataset):
             else:
                 files_not_found.append(ID)
 
-        if files_not_found != []:
+        if not files_not_found:
             print('The following IDs will be removed from the ID list.')
             for ID in files_not_found:
                 print(ID)
@@ -99,8 +100,8 @@ class Mp3Dataset(data.Dataset):
 
 
 if __name__ == '__main__':
-    audio_path = os.path.join('data', 'fma_small')
-    df = pd.read_csv('data/fma_metadata/small_track_info.csv')
+    audio_path = os.path.join('..', 'data', 'fma_small')
+    df = pd.read_csv('../data/fma_metadata/small_track_info.csv')
 
     torchaudio.initialize_sox()
 
