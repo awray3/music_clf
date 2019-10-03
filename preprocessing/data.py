@@ -45,6 +45,11 @@ class Mp3Dataset(data.Dataset):
                                                              n_mels=n_mels)
         self.clean_IDs()
 
+        self.melspecf = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
+                                                       n_fft=fft_window_pts,
+                                                       hop_length=hop_size,
+                                                       n_mels=n_mels)
+
     def __len__(self):
         return len(self.IDs)
 
