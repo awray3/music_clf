@@ -40,6 +40,11 @@ class Mp3Dataset(data.Dataset):
 
         self.clean_IDs()
 
+        self.melspecf = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
+                                                       n_fft=fft_window_pts,
+                                                       hop_length=hop_size,
+                                                       n_mels=n_mels)
+
     def __len__(self):
         return len(self.IDs)
 
@@ -58,10 +63,7 @@ class Mp3Dataset(data.Dataset):
             waveform = new_waveform
 
         # convert to melspec
-        melspec = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
-                                                       n_fft=fft_window_pts,
-                                                       hop_length=hop_size,
-                                                       n_mels=n_mels)(waveform)
+        melspec = self.melspecf(waveform).detach()
 
         # transpose the last two coordinates so that time is interpreted
         # as channels
