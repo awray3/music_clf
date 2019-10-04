@@ -1,6 +1,6 @@
 import os
 
-from preprocessing.fma_metadata import get_fma_csv
+from preprocessing.fma import get_fma_csv
 
 
 def create_csv(fma_size: str):
