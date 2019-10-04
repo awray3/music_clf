@@ -19,7 +19,6 @@ def clean_mp3_directory(audio_dir):
             for f in files:
                 try:
                     print('Loading ' + f, end='\r')
-                    # torchaudio.load(os.path.join(root, f))
                     torchaudio.info(os.path.join(root, f))
                 except RuntimeError as e:
                     print("Unable to load file" + f + ", " + repr(e))
@@ -40,11 +39,3 @@ def clean_mp3_directory(audio_dir):
                 print('Removed ' + fpath)
 
         print('Exiting cleaning.')
-
-
-if __name__ == '__main__':
-    audio_dir = 'data/fma_small'
-    clean_mp3_directory(audio_dir)
-
-    audio_dir = 'data/fma_medium'
-    clean_mp3_directory(audio_dir)
