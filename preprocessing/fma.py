@@ -7,12 +7,10 @@ import os
 import pandas as pd
 
 
-def create_csv(fma_size: str,
-               meta_path: str,
-               output_dir: str) -> pd.DataFrame:
+def create_df(fma_size: str, meta_path: str) -> pd.DataFrame:
     """
     meta_dir - directory to fma_metadata/tracks.csv
-    fma_size - "small" or "medium". "large" and "full" not implemented
+    fma_size - "small" or "medium". "large" and "full" not implemented.
     """
 
     tracks = pd.read_csv(meta_path, index_col=0, header=[0, 1])
@@ -37,8 +35,6 @@ def create_csv(fma_size: str,
     # rename columns
     df.columns = ['track_id', 'genre']
 
-
-    # scan 
-
-    df.to_csv(os.path.join(output_dir, fma_size +
-                           '_track_info.csv'), index=False)
+    # df.to_csv(os.path.join(output_dir, fma_size +
+                           # '_track_info.csv'), index=False)
+    return df
