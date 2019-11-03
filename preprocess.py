@@ -15,6 +15,7 @@ Note: if using the FMA dataset, each song only lasts up to 30 seconds.
 This script performs the following options
 """
 import os
+import pandas as pd
 
 from preprocessing.clean import clean_mp3_directory
 from preprocessing.fma import create_csv
@@ -26,6 +27,7 @@ def main(meta_dir: str,
          fma_size: str=None) -> None:
 
     print('Beginning preprocessing.')
+
     # if using FMA dataset, create metadata csv if it doesn't already exist.
     if fma_size:
         print('You have selected to use one of the FMA datasets.')
@@ -37,64 +39,17 @@ def main(meta_dir: str,
             raise ValueError('Track csv path not found.')
 
     # run cleaning script on the audio directory.
+    meta_df = pd.read_csv(meta_path)
     if os.path.isdir(audio_dir):
-        clean_mp3_directory(audio_dir)
+        meta_df = clean_mp3_directory(audio_dir, meta_df)
+        meta_df.to_csv(meta_path)
     else:
         raise ValueError('Audio directory not found.')
 
+
+
     print('Finished preprocessing.')
 
-    # load the metadata csv and shuffle it.
-    # meta_df = pd.read_csv(meta_path).sample(frac=1, random_state=1)
-
-    # shuffle into 60/20/20 train valid test split
-    # train_df, valid_df, test_df = np.split(
-    # meta_df.sample(frac=1, random_state=1),
-    # [int(.6 * len(meta_df)), int(.8 * len(meta_df))])
-
-    # parameters
-    # params = {'batch_size': 16, 'shuffle': True, 'num_workers': 2}
-
-    # turn on sox
-    # torchaudio.initialize_sox()
-
-    # Data generators
-    # training_set = Mp3Dataset(train_df, audio_path, 1.0)
-    # training_generator = data.DataLoader(training_set, **params)
-
-    # validation_set = Mp3Dataset(valid_df, audio_path, 1.0)
-    # validation_generator = data.DataLoader(validation_set, **params)
-
-    # test_set = Mp3Dataset(test_df, audio_path, 1.0)
-    # test_generator = data.DataLoader(test_set, **params)
-
-    # Model stuff
-
-    # create model instance
-
-    # loss_fn = torch.nn.CrossEntropyLoss()
-
-    # learning_rate = 1e-2
-    # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    # # # two epochs for now
-    # i = 1
-    # for t in range(2):
-    #     for batch_mel, batch_genre in training_generator:
-    #         # # # forward pass:
-    #         pred_genre = model(batch_mel)
-
-    #         # # # calculate loss
-    #         loss = loss_fn(pred_genre, batch_genre)
-    #         optimizer.zero_grad()
-
-    #         loss.backward()
-    #         optimizer.step()
-    #         print(f'Finished step {i} of {6400//16}.', end='\r')
-    #         i += 1
-    #     print(loss)
-
-    # close sox
 
 
 if __name__ == '__main__':
