@@ -52,6 +52,8 @@ training_generator = DataLoader(training_set, **params)
 # Model stuff
 model = Baseline_cnn()
 
+x = torch.randn(1, 1, 64, 87)
+
 # create model instance
 
 loss_fn = torch.nn.CrossEntropyLoss()
@@ -59,19 +61,19 @@ loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # two epochs for now
-for t in range(num_epochs):
-    for idx, (batch_mel, batch_genre) in enumerate(training_generator):
-        # forward pass:
-        pred_genre = model(batch_mel)
+# for t in range(num_epochs):
+    # for idx, (batch_mel, batch_genre) in enumerate(training_generator):
+        # # forward pass:
+        # pred_genre = model(batch_mel)
 
-        # calculate loss
-        loss = loss_fn(pred_genre, batch_genre)
-        optimizer.zero_grad()
+        # # calculate loss
+        # loss = loss_fn(pred_genre, batch_genre)
+        # optimizer.zero_grad()
 
-        loss.backward()
-        optimizer.step()
-        print(f'Finished step {idx} of {6400//16}.', end='\r')
-    print(loss)
+        # loss.backward()
+        # optimizer.step()
+        # print(f'Finished step {idx} of {6400//16}.', end='\r')
+    # print(loss)
 
 # close sox
 torchaudio.shutdown_sox()
