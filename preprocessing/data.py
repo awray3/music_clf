@@ -96,7 +96,7 @@ class Mp3Dataset(data.Dataset):
             else:
                 files_not_found.append(ID)
 
-        if not files_not_found:
+        if files_not_found:
             print('The following IDs will be removed from the ID list.')
             for ID in files_not_found:
                 print(ID)
