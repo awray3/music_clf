@@ -56,8 +56,7 @@ class Baseline_cnn(nn.Module):
 
 
 
-if __name__=='__main__':
-
+if __name__ == '__main__':
     import torch
     model = Baseline_cnn()
     x = torch.randn(1, 1, 64, 87)
