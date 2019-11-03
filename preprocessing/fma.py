@@ -37,5 +37,8 @@ def create_csv(fma_size: str,
     # rename columns
     df.columns = ['track_id', 'genre']
 
+
+    # scan 
+
     df.to_csv(os.path.join(output_dir, fma_size +
                            '_track_info.csv'), index=False)
