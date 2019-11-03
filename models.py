@@ -15,11 +15,11 @@ class Baseline_cnn(nn.Module):
     arxiv.org/1802.09697 for this model.
     """
 
-    def __init__(self, num_conv_channels=64, kernel_size=3, momentum=0.9):
+    def __init__(self, momentum=0.9):
         super(Baseline_cnn, self).__init__()
 
         # input size: (1, 64, T)
-        self.conv1 = nn.Conv2d(1, num_conv_channels, kernel_size)
+        self.conv1 = nn.Conv2d(1, 64, 3)
         self.conv2 = nn.Conv2d(64, 64, kernel_size=(3, 5))
         self.dense1 = nn.Linear(64 * 14 * 4, 32)
         self.dense2 = nn.Linear(32, 8)
@@ -55,6 +55,13 @@ class Baseline_cnn(nn.Module):
         return num_features
 
 
+
+if __name__=='__main__':
+
+    import torch
+    model = Baseline_cnn()
+    x = torch.randn(1, 1, 64, 87)
+    print(model(x))
 
 
 
