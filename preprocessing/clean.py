@@ -6,7 +6,7 @@ import os
 import torchaudio
 
 
-def clean_mp3_directory(audio_dir, meta_df):
+def clean_mp3_directory(audio_dir):
     """
     module for checking corruptness of mp3s. Loops over the given
     directory attempting to load info on the tracks. If loading fails,
@@ -23,7 +23,7 @@ def clean_mp3_directory(audio_dir, meta_df):
                     torchaudio.info(os.path.join(root, f))
                 except RuntimeError as e:
                     print("Unable to load file" + f + ", " + repr(e))
-                    corrupted_list.append(f)
+                    corrupted_list.append(os.path.join(root, f))
 
     if len(corrupted_list) == 0:
         print('No mp3s were found to be corrupted. Exiting cleaning.')
@@ -33,19 +33,15 @@ def clean_mp3_directory(audio_dir, meta_df):
         for fpath in corrupted_list:
             print(fpath)
         delete_option = input(
-            'Would you like to delete these files? (yes/no) ')
+            'Would you like to delete these files? (yes/no): ')
         if delete_option == 'yes':
             # delete the files
-            for f in corrupted_list:
-                os.remove(os.path.join(root, f))
-                print('Removed ' + fpath)
+            for fpath in corrupted_list:
+                os.remove(fpath)
+                print('Removed ' + os.path.split(fpath)[1][:-4] + '.')
 
-            # remove the rows from meta_df
-            corrupted_list = [int(f[:-4]) for f in corrupted_list]
-            meta_df = meta_df.loc[~meta_df['track_id'].isin(corr_list), :]
+        corrupted_list = [int(os.path.split(fpath)[1][:-4]) for fpath in corrupted_list]
 
     print('Exiting cleaning.')
 
-    return meta_df
-
-
+    return corrupted_list
