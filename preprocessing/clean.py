@@ -12,7 +12,7 @@ def clean_mp3_directory(audio_dir, meta_df):
     directory attempting to load info on the tracks. If loading fails,
     the user will be asked if they want to remove the corrupt files
     from their system. If a file is removed, then the corresponding row from the
-    meta csv will also be removed.
+    meta csv will also be removed and returned by this method.
     """
     corrupted_list = []
     for root, dirs, files in os.walk(audio_dir):
@@ -43,7 +43,6 @@ def clean_mp3_directory(audio_dir, meta_df):
             # remove the rows from meta_df
             corrupted_list = [int(f[:-4]) for f in corrupted_list]
             meta_df = meta_df.loc[~meta_df['track_id'].isin(corr_list), :]
-
 
     print('Exiting cleaning.')
 
