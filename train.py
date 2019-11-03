@@ -7,10 +7,11 @@ import numpy as np
 import pandas as pd
 
 import torch
+from torch.utils.data import DataLoader
 import torchaudio
+
 from models import Baseline_cnn
 from preprocessing.data import Mp3Dataset
-from torch.utils.data import DataLoader
 
 # audio path
 
@@ -32,9 +33,10 @@ train_df, valid_df, test_df = np.split(
         )
 
 # parameters
-params = {'batch_size': 16, 'shuffle': True, 'num_workers': 0}
+batch_size = 16
 learning_rate = 1e-2
-num_epochs = 2
+num_epochs = 10
+params = {'batch_size': batch_size, 'shuffle': True, 'num_workers': 0}
 
 # turn on sox
 torchaudio.initialize_sox()
@@ -49,31 +51,40 @@ training_generator = DataLoader(training_set, **params)
 # test_set = Mp3Dataset(test_df, audio_path, 1.0)
 # test_generator = DataLoader(test_set, **params)
 
-# Model stuff
-model = Baseline_cnn()
 
-x = torch.randn(1, 1, 64, 87)
+# for idx, (batch_mel, batch_genre) in enumerate(training_generator):
+    # print(model(batch_mel).size())
+    # break
 
 # create model instance
+model = Baseline_cnn()
 
 loss_fn = torch.nn.CrossEntropyLoss()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-# two epochs for now
-# for t in range(num_epochs):
-    # for idx, (batch_mel, batch_genre) in enumerate(training_generator):
-        # # forward pass:
-        # pred_genre = model(batch_mel)
+for t in range(num_epochs):
 
-        # # calculate loss
-        # loss = loss_fn(pred_genre, batch_genre)
-        # optimizer.zero_grad()
+    running_loss = 0.0
+    num_correct = 0
+    for idx, (batch_mel, batch_genre) in enumerate(training_generator):
+        # forward pass:
+        pred_genre = model(batch_mel)
 
-        # loss.backward()
-        # optimizer.step()
-        # print(f'Finished step {idx} of {6400//16}.', end='\r')
-    # print(loss)
+        # calculate loss
+        loss = loss_fn(pred_genre, batch_genre)
+        optimizer.zero_grad()
+
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+        
+    for mel, genre in training_generator:
+        output = model(mel)
+
+    print(f'Epoch {t/num_epochs}, Training loss: {running_loss}, Accuracy: ' )
 
 # close sox
 torchaudio.shutdown_sox()
