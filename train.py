@@ -2,10 +2,10 @@
 Main script for training and analyzing models.
 """
 # import os
+import time
 
 import numpy as np
 import pandas as pd
-
 import torch
 from torch.utils.data import DataLoader
 import torchaudio
@@ -66,8 +66,11 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 for t in range(num_epochs):
 
     running_loss = 0.0
-    num_correct = 0
+    # num_correct = 0
+    t1 = time.time()
     for idx, (batch_mel, batch_genre) in enumerate(training_generator):
+
+        print(f'Batch index: {idx}')       
         # forward pass:
         pred_genre = model(batch_mel)
 
@@ -80,11 +83,13 @@ for t in range(num_epochs):
 
         running_loss += loss.item()
 
-        
+
     for mel, genre in training_generator:
         output = model(mel)
 
-    print(f'Epoch {t/num_epochs}, Training loss: {running_loss}, Accuracy: ' )
+    t2 = time.time()
+
+    print(f'Epoch {t/num_epochs}, Training loss: {running_loss}, time: {t2-t1}: ' )
 
 # close sox
 torchaudio.shutdown_sox()
