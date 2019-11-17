@@ -63,6 +63,7 @@ loss_fn = torch.nn.CrossEntropyLoss()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
+# training loop
 for t in range(num_epochs):
 
     running_loss = 0.0
