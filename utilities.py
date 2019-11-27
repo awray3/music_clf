@@ -38,6 +38,21 @@ def attach_onehot_encoding(df, column_name):
 
     return df
 
+def mp3_to_mel_path(mp3_path, output_dir=melspec_dir):
+    """
+    Take the mp3 path and find the melspec path.
+    Returns the melspec path.
+    """
+
+    melspec_path = glob.glob(os.path.join(output_dir, id_from_path(mp3_path) + ".npz"))
+
+    if melspec_path:
+        return melspec_path[0]
+    else:
+        raise FileNotFoundError(
+            f"Did not find a melspectrogram with id {id_from_path(mp3_path)}"
+        )
+
 def read_metadata_file(path, all_filepaths, bad_filepaths):
     all_metadata = pd.read_csv(path, header=[0,1], index_col=0)
     
