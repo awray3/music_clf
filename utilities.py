@@ -28,6 +28,16 @@ def id_from_path(mp3_path):
     """
     return os.path.split(mp3_path)[1][:-4]
 
+def attach_onehot_encoding(df, column_name):
+    """
+    Append the onehot representation of `column` onto the right end
+    of the array df.
+    """
+
+    df = pd.concat([df, pd.get_dummies(df.genre)], axis=1)
+
+    return df
+
 def read_metadata_file(path, all_filepaths, bad_filepaths):
     all_metadata = pd.read_csv(path, header=[0,1], index_col=0)
     
@@ -53,9 +63,6 @@ def read_metadata_file(path, all_filepaths, bad_filepaths):
             inplace=True
         )
         print(f"Dropped {len(bad_filepaths)} rows from the dataframe.")
-        
-    # one-hot encoding of columns
-    df = pd.concat([df, pd.get_dummies(df.genre)], axis=1)
 
     return df
 
