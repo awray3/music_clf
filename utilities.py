@@ -1,9 +1,13 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
 from librosa.feature import melspectrogram
 from librosa import power_to_db, load
 from librosa.display import specshow
+
 from tensorflow.keras.utils import Sequence 
 
 def view_melspec(source, sr):
@@ -18,6 +22,11 @@ def view_melspec(source, sr):
     plt.tight_layout()
     plt.show()
 
+def id_from_path(mp3_path):
+    """
+    returns the id of the given mp3 path.
+    """
+    return os.path.split(mp3_path)[1][:-4]
 
 def read_metadata_file(path, all_filepaths, bad_filepaths):
     all_metadata = pd.read_csv(path, header=[0,1], index_col=0)
@@ -104,3 +113,4 @@ class Batch_generator(Sequence) :
                     :melspecs[i].shape[1]] = melspecs[i]
         
         return stacked_arr
+
