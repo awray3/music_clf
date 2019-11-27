@@ -1,4 +1,5 @@
 import os
+import glob
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,7 +39,7 @@ def attach_onehot_encoding(df, column_name):
 
     return df
 
-def mp3_to_mel_path(mp3_path, output_dir=melspec_dir):
+def mp3_to_mel_path(mp3_path, output_dir):
     """
     Take the mp3 path and find the melspec path.
     Returns the melspec path.
