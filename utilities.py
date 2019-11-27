@@ -39,16 +39,16 @@ def attach_onehot_encoding(df, column_name):
 
     return df
 
-def mp3_to_mel_path(mp3_path, output_dir):
+def mp3_to_mel_path(mp3_path, melspec_dir):
     """
     Take the mp3 path and find the melspec path.
     Returns the melspec path.
     """
 
-    melspec_path = glob.glob(os.path.join(output_dir, id_from_path(mp3_path) + ".npz"))
+    melspec_path = os.path.join(melspec_dir, id_from_path(mp3_path) + ".npz")
 
-    if melspec_path:
-        return melspec_path[0]
+    if os.path.exists(melspec_path):
+        return melspec_path
     else:
         raise FileNotFoundError(
             f"Did not find a melspectrogram with id {id_from_path(mp3_path)}"
