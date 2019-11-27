@@ -44,12 +44,12 @@ def read_metadata_file(path, all_filepaths, bad_filepaths):
     df.columns = ['track_id', 'genre']
     
     # add filepaths to the dataframe
-    df['raw_path'] = all_filepaths
+    df['mp3_path'] = all_filepaths
     
     # Remove bad mp3s from the dataframe so that we skip them.
-    if df.raw_path.isin(bad_filepaths).sum():
+    if df.mp3_path.isin(bad_filepaths).sum():
         df.drop(
-            df.loc[df.raw_path.isin(bad_filepaths), :].index,
+            df.loc[df.mp3_path.isin(bad_filepaths), :].index,
             inplace=True
         )
         print(f"Dropped {len(bad_filepaths)} rows from the dataframe.")
@@ -67,7 +67,7 @@ class Batch_generator(Sequence) :
     """
   
     def __init__(self, meta_df, batch_size, sr, duration):
-        self.mp3_paths = meta_df['raw_path'].to_list()
+        self.mp3_paths = meta_df['mp3_path'].to_list()
         self.labels = meta_df.loc[:, meta_df.genre.unique()].to_numpy()
         self.batch_size = batch_size
         self.sr = sr
