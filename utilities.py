@@ -89,22 +89,20 @@ class Batch_generator(Sequence) :
     and peels off the paths and the encoded genres.
     """
   
-    def __init__(self, meta_df, batch_size, sr, duration):
-        self.mp3_paths = meta_df['mp3_path'].to_list()
+    def __init__(self, meta_df, batch_size):
+        self.mel_paths = meta_df['mel_path'].to_list()
         self.labels = meta_df.loc[:, meta_df.genre.unique()].to_numpy()
         self.batch_size = batch_size
-        self.sr = sr
-        self.duration = duration
     
     def __len__(self):
         """
         Return number of batches.
         """
-        return (np.ceil(len(self.mp3_paths) / float(self.batch_size))).astype(np.int)
+        return (np.ceil(len(self.mel_paths) / float(self.batch_size))).astype(np.int)
   
     def __getitem__(self, idx):
         
-        batch_x = self.mp3_paths[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_x = self.mel_paths[idx * self.batch_size : (idx + 1) * self.batch_size]
         batch_y = self.labels[idx * self.batch_size : (idx + 1) * self.batch_size, :]
         
         return self._stack_melspecs(batch_x), batch_y
@@ -115,9 +113,8 @@ class Batch_generator(Sequence) :
         Stack the melspectrograms of the files in the list.
         Extends by zeros if needed.
         """
-        sources = [load(file, sr=self.sr, duration=self.sr)[0] for file in filepath_list]
 
-        melspecs = [melspectrogram(src, sr=self.sr) for src in sources]
+        melspecs = [np.load(mel_file)['arr_0'] for mel_file in filepath_list]
         
         
         stacked_arr = np.zeros((len(filepath_list),
