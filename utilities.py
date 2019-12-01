@@ -132,5 +132,6 @@ class Batch_generator(Sequence) :
                     :melspecs[i].shape[0],
                     :melspecs[i].shape[1]] = melspecs[i]
         
-        return stacked_arr
+
+        return np.expand_dims(stacked_arr, 1)
 
