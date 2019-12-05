@@ -23,7 +23,7 @@ def view_melspec(source, sr):
     plt.tight_layout()
     plt.show()
 
-def plot_sample(genre, nrow=3, meta_df=meta_df, waveform=False, **kwargs):
+def plot_sample(genre, nrow=3, meta_df, waveform=False, **kwargs):
     """
     Plots 2*nrow randomly chosen spectrograms
     (or waveforms if set to True) from the given genre.
