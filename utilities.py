@@ -23,6 +23,37 @@ def view_melspec(source, sr):
     plt.tight_layout()
     plt.show()
 
+def plot_sample(genre, nrow=3, meta_df=meta_df, waveform=False, **kwargs):
+    """
+    Plots 2*nrow randomly chosen spectrograms
+    (or waveforms if set to True) from the given genre.
+    """
+    # sample 6 randomly chosen songs with given genre
+    samples = meta_df.loc[meta_df[genre] == 1, :].sample(n=2 * nrow)
+
+    fig = plt.figure(figsize=(12, 8))
+    fig.suptitle("Genre: " + genre)
+    fig.subplots_adjust(hspace=0.7, wspace=0.4)
+
+#     return np.load(samples["mel_path"].iloc[0])
+
+    for i in range(2 * nrow):
+        plt.subplot(nrow, 2, i+1)
+
+
+        if waveform:
+            wave = librosa.load(samples["mp3_path"].iloc[i], **kwargs)
+            plt.xlabel("Sample Position")
+            plt.ylabel("Amplitude")
+        else:
+            S = np.load(samples["mel_path"].iloc[i])['arr_0']
+#             S_dB = librosa.power_to_db(S, ref=np.max)
+            specshow(S, x_axis="time", y_axis="mel", fmax=8000, **kwargs)
+            plt.colorbar(format="%+2.0f dB")
+            plt.title("Track id " + str(samples["track_id"].iloc[i]))
+    plt.show()
+
+
 def id_from_path(mp3_path):
     """
     returns the id of the given mp3 path.
