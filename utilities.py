@@ -1,12 +1,11 @@
 import os
-import glob
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from librosa.feature import melspectrogram
-from librosa import power_to_db, load
+from librosa import power_to_db, load, get_duration
 from librosa.display import specshow
 
 from tensorflow.keras.utils import Sequence 
@@ -112,7 +111,7 @@ def read_metadata_file(path, all_filepaths, bad_filepaths):
         print(f"Dropped {len(bad_filepaths)} rows from the dataframe.")
 
     df['duration'] = df['mp3_path'].apply(lambda x:
-            librosa.get_duration(filename=x))
+            get_duration(filename=x))
 
     return df
 
