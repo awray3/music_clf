@@ -122,17 +122,18 @@ class Batch_generator(Sequence) :
     and peels off the paths and the encoded genres.
     """
   
-    def __init__(self, meta_df, batch_size, genre_list):
+    def __init__(self, meta_df, batch_size, genre_dict):
         self.mel_paths = meta_df['mel_path'].to_list()
-        self.labels = meta_df.loc[:, genre_list].to_numpy()
+        self.labels = meta_df.loc[:, list(genre_dict.keys())].to_numpy()
         self.batch_size = batch_size
+
     
     def __len__(self):
         """
         Return number of batches.
         """
         return (np.ceil(len(self.mel_paths) / float(self.batch_size))).astype(np.int)
-  
+
     def __getitem__(self, idx):
         
         batch_x = self.mel_paths[idx * self.batch_size : (idx + 1) * self.batch_size]
