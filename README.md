@@ -3,8 +3,7 @@ Preprocessing and deep learning models for music genre classification.
 
 # Disclaimer
 
-This project is a work-in-progress. My code is being updated when possible, so the
-instructions below may not be quite up to speed yet.
+This project is a work-in-progress. My code is being updated when possible.
 
 ## Description
 
