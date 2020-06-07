@@ -1,10 +1,6 @@
 # Music CLF
 Preprocessing and deep learning models for music genre classification.
 
-# Disclaimer
-
-## Description
-
 This project was inspired by the [FMA dataset](https://github.com/mdeff/fma) and analysis done by [Priya Dwivedi](https://towardsdatascience.com/using-cnns-and-rnns-for-music-genre-recognition-2435fb2ed6af).
 
 # Installation
@@ -21,3 +17,5 @@ Then install the prerequisites:
 
 `ffmpeg` is a tool for working with audio data that is used by the python
 package `librosa`, which will be used for audio processing.
+This will allow us to work with `.mp3` files, `.wav` files, and more 
+within python.
