@@ -9,8 +9,15 @@ This project was inspired by the [FMA dataset](https://github.com/mdeff/fma) and
 
 # Installation
 
-First create a new anaconda environment.
+First create a new anaconda environment:
 
-	conda create --name genre_recog python=3.8
+	conda create --name genre_recognition python=3.8
+	conda activate genre_recognition
 
-Then install the prerequisites.
+Then install the prerequisites:
+
+	conda install -c conda-forge ffmpeg
+	pip install -r requirements.txt
+
+`ffmpeg` is a tool for working with audio data that is used by the python
+package `librosa`, which will be used for audio processing.
