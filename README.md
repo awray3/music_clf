@@ -7,6 +7,13 @@ This project was inspired by the [FMA dataset](https://github.com/mdeff/fma) and
 
 Follow these steps if you wish to work with the notebook on your own machine.
 
+## Directory Management
+
+Within a clone of this repository create a new folder called `data`.
+Obtain the FMA dataset (I used the "small" version) and metadata zip files
+from their repository linked above. Unzip them in this folder.
+You should now have folders `data/fma_small/` and `data/fma_metadata`.
+
 ## Environment setup
 
 Create a new anaconda environment:
