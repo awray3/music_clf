@@ -1,4 +1,5 @@
 import os
+import glob
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +9,11 @@ from librosa.feature import melspectrogram
 from librosa import power_to_db, load, get_duration
 from librosa.display import specshow
 
+from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, EarlyStopping
 from tensorflow.keras.utils import Sequence 
+from sklearn.metrics import confusion_matrix, classification_report
 
 def view_melspec(source, sr):
     plt.figure(figsize=(10, 4))
@@ -16,7 +21,7 @@ def view_melspec(source, sr):
     S_dB = power_to_db(S, ref=np.max)
     specshow(S_dB, x_axis='time',
                              y_axis='mel', sr=sr,
-                             fmax=8000)
+                             fmax=2048)
     plt.colorbar(format='%+2.0f dB')
     plt.title('Melspectrogram')
     plt.tight_layout()
@@ -34,8 +39,6 @@ def plot_sample(genre, meta_df, nrow=3, waveform=False, **kwargs):
     fig.suptitle("Genre: " + genre)
     fig.subplots_adjust(hspace=0.7, wspace=0.4)
 
-#     return np.load(samples["mel_path"].iloc[0])
-
     for i in range(2 * nrow):
         plt.subplot(nrow, 2, i+1)
 
@@ -45,9 +48,12 @@ def plot_sample(genre, meta_df, nrow=3, waveform=False, **kwargs):
             plt.xlabel("Sample Position")
             plt.ylabel("Amplitude")
         else:
+            #Load the melspectrogram
             S = np.load(samples["mel_path"].iloc[i])['arr_0']
-#             S_dB = librosa.power_to_db(S, ref=np.max)
-            specshow(S, x_axis="time", y_axis="mel", fmax=8000, **kwargs)
+            #convert from power to db 
+            S_dB = librosa.power_to_db(S, ref=np.max)
+            specshow(S, x_axis="time", y_axis="mel", fmax=2048
+                    **kwargs)
             plt.colorbar(format="%+2.0f dB")
             plt.title("Track id " + str(samples["track_id"].iloc[i]))
     plt.show()
@@ -116,56 +122,132 @@ def read_metadata_file(path, all_filepaths, bad_filepaths):
     return df
 
 
-class Batch_generator(Sequence) :
+
+class MyModel:
     """
-    Data generator class. Takes in the meta dataframe (or a train/test/split) 
-    and peels off the paths and the encoded genres.
+    Wrapper class that manages training, loading, and evaluation of a model.
     """
-  
-    def __init__(self, meta_df, batch_size, genre_dict):
-        self.mel_paths = meta_df['mel_path'].to_list()
-        self.labels = meta_df.loc[:, list(genre_dict.keys())].to_numpy()
+
+    def __init__(self, batch_size, model_dir, genre_labels, X_train, y_train, X_test, y_test):
         self.batch_size = batch_size
+        self.model_dir = model_dir
+        self.genre_labels = genre_labels
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_test = X_test
+        self.y_test = y_test
 
-    
-    def __len__(self):
+
+        self.model_path = glob.glob(os.path.join(model_dir, "*.h5"))
+        ### Currently this will fail if there isn't already a file there.
+
+        if self.model_path:
+            self.model_path = self.model_path[0]
+        else:
+            self.model_path = os.path.join(self.model_dir, "model.h5")
+
+        self.input_shape = (1,) + self.X_train.shape[1:]
+
+    def attach_model(self, model):
+        """ Attach a Keras model. """
+        self.model = model
+
+    def load_model(self):
         """
-        Return number of batches.
+        Loads the model from the model directory. Alternative to passing 
+        a new model.
         """
-        return (np.ceil(len(self.mel_paths) / float(self.batch_size))).astype(np.int)
+        if os.path.exists(self.model_path):
+            self.model = load_model(self.model_path)
+        else:
+            raise ValueError("File Not Found. Please train the model.")
 
-    def __getitem__(self, idx):
-        
-        batch_x = self.mel_paths[idx * self.batch_size : (idx + 1) * self.batch_size]
-        batch_y = self.labels[idx * self.batch_size : (idx + 1) * self.batch_size, :]
-        
-        return self._stack_melspecs(batch_x), batch_y
-    
-    def _stack_melspecs(self, filepath_list):
-        """
-        A helper function for loading batches of melspectrograms.
-        Stack the melspectrograms of the files in the list.
-        Extends by zeros if needed.
-        """
+    def fit(self, num_epochs):
+        checkpoint_callback = ModelCheckpoint(
+            self.model_path,
+            monitor="val_accuracy",
+            verbose=1,
+            save_best_only=True,
+            mode="max",
+        )
+        reducelr_callback = ReduceLROnPlateau(
+            monitor="val_accuracy", factor=0.5, patience=5, min_delta=0.01, verbose=1
+        )
+        early_stop = EarlyStopping(
+            monitor="val_accuracy", patience=10, verbose=1, restore_best_weights=True
+        )
 
-        melspecs = [np.load(mel_file)['arr_0'] for mel_file in filepath_list]
-        
-        
-        stacked_arr = np.zeros((len(filepath_list),
-                                max(
-                                    [melspec.shape[0] for melspec in melspecs]
-                                ),
-                                max(
-                                    [melspec.shape[1] for melspec in melspecs]
-                                )
-                               )
-                              )
+        callbacks_list = [checkpoint_callback, reducelr_callback, early_stop]
 
-        for i in range(len(filepath_list)):
-            stacked_arr[i,
-                    :melspecs[i].shape[0],
-                    :melspecs[i].shape[1]] = melspecs[i]
-        
+        self.history = self.model.fit(
+            x=self.X_train,
+            y=self.y_train,
+            epochs=num_epochs,
+            validation_split=0.1,
+            verbose=1,
+            callbacks=callbacks_list,
+        )
 
-        return np.expand_dims(stacked_arr, -1)
+    def summary(self):
+        return self.model.summary()
 
+    def _compile(self):
+        self.model.compile(
+            optimizer=Adam(lr=0.001),
+            loss="categorical_crossentropy",
+            metrics=["accuracy"],
+        )
+
+    def evaluate(self, verbose=0, all=False):
+
+        print("Training set")
+        self.model.evaluate(
+                x=self.X_train,
+                y=self.y_train,
+                verbose=verbose)
+        print("Testing set")
+        self.model.evaluate(
+                x=self.X_test,
+                y=self.y_test,
+                verbose=verbose)
+
+    def plot_history(self):
+        plt.plot(self.history.history["accuracy"])
+        plt.plot(self.history.history["val_accuracy"])
+        plt.title("Model accuracy")
+        plt.ylabel("Accuracy")
+        plt.xlabel("Epoch")
+        plt.legend(["Train", "Valid"], loc="upper left")
+        plt.show()
+
+        plt.savefig(os.path.join(self.model_dir, "last_training_acc.png"))
+
+        # Plot training & validation loss values
+        plt.plot(self.history.history["loss"])
+        plt.plot(self.history.history["val_loss"])
+        plt.title("Model loss")
+        plt.ylabel("Loss")
+        plt.xlabel("Epoch")
+        plt.legend(["Train", "Valid"], loc="upper left")
+        plt.show()
+        plt.savefig(os.path.join(self.model_dir, "last_training_loss.png"))
+
+    def confusion_matrix(self, print_labels=True):
+
+        y_pred = np.argmax(self.model.predict(self.X_test), axis=1)
+        classes = np.argmax(self.y_test, axis=1)
+
+
+        print(confusion_matrix(classes, y_pred))
+
+    def classification_report(self):
+
+        y_pred = np.argmax(self.model.predict(self.X_test), axis=1)
+        classes = np.argmax(self.y_test, axis=1)
+
+        print(
+            classification_report(
+                classes, y_pred,
+                target_names=self.genre_labels
+            )
+        )
