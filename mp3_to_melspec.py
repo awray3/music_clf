@@ -34,16 +34,9 @@ def save_melspec(
 
     src, _ = load(mp3_path, sr=sr, duration=duration, offset=offset)
 
-    savez(output_path, power_to_db(
-        melspectrogram(
-                y=src,
-                sr=sr,
-                n_mels=128,
-                #                 n_fft=512, hop_length=512 // 2
+    savez(output_path,
+            melspectrogram(y=src, sr=sr, n_mels=128, fmax=2048)
             )
-            ** 2
-        ),
-    )
 
     print(f"Finished {id_from_path(mp3_path)}", end="\r")
 
