@@ -121,6 +121,20 @@ def read_metadata_file(path, all_filepaths, bad_filepaths):
 
     return df
 
+def subset_data(meta_df, genre_list, n_samples):
+    """ Loads melspecs from meta_df from the given genres. Only returns a random subset of size n_samples."""
+    
+    meta_sub_df = meta_df.loc[meta_df["genre"].isin(genre_list), :].sample(n_samples)
+    
+    all_melspecs = []  
+    for path in meta_sub_df.mel_path.values:
+        all_melspecs.append(np.load(path)["arr_0"])
+        
+    X = np.stack(all_melspecs)
+    
+    y = meta_sub_df[genre_list].to_numpy()
+    
+    return X, y
 
 
 class MyModel:
@@ -251,3 +265,6 @@ class MyModel:
                 target_names=self.genre_labels
             )
         )
+
+
+
