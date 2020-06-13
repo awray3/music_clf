@@ -17,7 +17,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 def view_melspec(source, sr):
     plt.figure(figsize=(10, 4))
-    S = melspectrogram(source, sr=sr)
+    S = melspectrogram(source, sr=sr, n_mels=128)
     S_dB = power_to_db(S, ref=np.max)
     specshow(S_dB, x_axis='time',
                              y_axis='mel', sr=sr,
@@ -51,8 +51,8 @@ def plot_sample(genre, meta_df, nrow=3, waveform=False, **kwargs):
             #Load the melspectrogram
             S = np.load(samples["mel_path"].iloc[i])['arr_0']
             #convert from power to db 
-            S_dB = librosa.power_to_db(S, ref=np.max)
-            specshow(S, x_axis="time", y_axis="mel", fmax=2048
+            S_dB = power_to_db(S, ref=np.max)
+            specshow(S_dB, x_axis="time", y_axis="mel", fmax=2048,
                     **kwargs)
             plt.colorbar(format="%+2.0f dB")
             plt.title("Track id " + str(samples["track_id"].iloc[i]))
