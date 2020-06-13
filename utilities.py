@@ -18,7 +18,7 @@ def view_melspec(source, sr):
                              y_axis='mel', sr=sr,
                              fmax=8000)
     plt.colorbar(format='%+2.0f dB')
-    plt.title('Mel-frequency spectrogram')
+    plt.title('Melspectrogram')
     plt.tight_layout()
     plt.show()
 
