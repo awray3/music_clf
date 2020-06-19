@@ -14,7 +14,7 @@ warnings.filterwarnings(action='ignore')
 melspec_dir = os.path.join(".", "data", "fma_small_melspecs")
 meta_path = os.path.join(".","data","fma_metadata","meta_df.csv")
 
-global_dur = 2.0
+global_dur = 3.0
 global_sr = 22050
 
 def save_melspec(
