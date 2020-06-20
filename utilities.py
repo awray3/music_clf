@@ -21,7 +21,7 @@ def view_melspec(source, sr):
     S_dB = power_to_db(S, ref=np.max)
     specshow(S_dB, x_axis='time',
                              y_axis='mel', sr=sr,
-                             fmax=2048)
+                             fmax=4092)
     plt.colorbar(format='%+2.0f dB')
     plt.title('Melspectrogram')
     plt.tight_layout()
@@ -52,7 +52,7 @@ def plot_sample(genre, meta_df, nrow=3, waveform=False, **kwargs):
             S = np.load(samples["mel_path"].iloc[i])['arr_0']
             #convert from power to db 
             S_dB = power_to_db(S, ref=np.max)
-            specshow(S_dB, x_axis="time", y_axis="mel", fmax=2048,
+            specshow(S_dB, x_axis="time", y_axis="mel", fmax=4092,
                     **kwargs)
             plt.colorbar(format="%+2.0f dB")
             plt.title("Track id " + str(samples["track_id"].iloc[i]))
