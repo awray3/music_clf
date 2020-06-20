@@ -17,7 +17,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 def view_melspec(source, sr):
     plt.figure(figsize=(10, 4))
-    S = melspectrogram(source, sr=sr, n_mels=128)
+    S = melspectrogram(source, sr=sr, n_mels=200)
     S_dB = power_to_db(S, ref=np.max)
     specshow(S_dB, x_axis='time',
                              y_axis='mel', sr=sr,
@@ -121,18 +121,38 @@ def read_metadata_file(path, all_filepaths, bad_filepaths):
 
     return df
 
+def standardize_2d_array(X):
+    """ This is a min-max scaler for a 2D numpy array. """
+    return (X-X.min())/(X.max()-X.min())
+
 def subset_data(meta_df, genre_list, n_samples):
-    """ Loads melspecs from meta_df from the given genres. Only returns a random subset of size n_samples."""
+    """
+    Loads melspecs from meta_df from the given genres and normalizes them.
+    Only returns a random subset of size n_samples.
+    """
     
     meta_sub_df = meta_df.loc[meta_df["genre"].isin(genre_list), :].sample(n_samples)
     
     all_melspecs = []  
     for path in meta_sub_df.mel_path.values:
-        all_melspecs.append(np.load(path)["arr_0"])
+        if not np.any(np.isnan(
+                            loaded_array := standardize_2d_array(np.load(path)["arr_0"])
+                            )
+                        ):
+            all_melspecs.append(loaded_array)
+        else: 
+            print(f"track with id {id_from_path(path)} was non-standardizable. Dropping from dataset.")
+            meta_sub_df.drop(
+                    meta_sub_df.loc[meta_sub_df.mel_path==path,:].index,
+                    inplace=True
+                    )
+
+
         
-    X = np.stack(all_melspecs)
-    
+    X = np.stack(all_melspecs) 
     y = meta_sub_df[genre_list].to_numpy()
+
+    assert X.shape[0] == len(y)
     
     return X, y
 
@@ -151,6 +171,9 @@ class MyModel:
         self.X_test = X_test
         self.y_test = y_test
 
+
+        if not os.path.exists(self.model_dir):
+            os.mkdir(self.model_dir)
 
         self.model_path = glob.glob(os.path.join(model_dir, "*.h5"))
         ### Currently this will fail if there isn't already a file there.
@@ -176,39 +199,41 @@ class MyModel:
         else:
             raise ValueError("File Not Found. Please train the model.")
 
-    def fit(self, num_epochs):
+    def fit(self, num_epochs, verbose=1):
         checkpoint_callback = ModelCheckpoint(
             self.model_path,
             monitor="val_accuracy",
-            verbose=1,
+            verbose=verbose,
             save_best_only=True,
             mode="max",
         )
         reducelr_callback = ReduceLROnPlateau(
-            monitor="val_accuracy", factor=0.5, patience=5, min_delta=0.01, verbose=1
+            monitor="val_accuracy", factor=0.5, patience=5, min_delta=0.01,
+            verbose=verbose
         )
-        early_stop = EarlyStopping(
-            monitor="val_accuracy", patience=10, verbose=1, restore_best_weights=True
-        )
+        # early_stop = EarlyStopping(
+            # monitor="val_accuracy", patience=15, verbose=1, restore_best_weights=True
+        # )
 
-        callbacks_list = [checkpoint_callback, reducelr_callback, early_stop]
+        # callbacks_list = [checkpoint_callback, reducelr_callback, early_stop]
+        callbacks_list = [checkpoint_callback, reducelr_callback]
 
         self.history = self.model.fit(
             x=self.X_train,
             y=self.y_train,
             epochs=num_epochs,
             validation_split=0.1,
-            verbose=1,
+            verbose=verbose,
             callbacks=callbacks_list,
         )
 
     def summary(self):
         return self.model.summary()
 
-    def _compile(self):
+    def _compile(self, loss="categorical_crossentropy"):
         self.model.compile(
             optimizer=Adam(lr=0.001),
-            loss="categorical_crossentropy",
+            loss=loss,
             metrics=["accuracy"],
         )
 
