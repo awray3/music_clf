@@ -159,7 +159,8 @@ def subset_data(meta_df, genre_list, n_samples):
 
 class MyModel:
     """
-    Wrapper class that manages training, loading, and evaluation of a model.
+    Wrapper class that manages training, loading, hyperparameter tuning,
+    and evaluation of a model.
     """
 
     def __init__(self, batch_size, model_dir, genre_labels, X_train, y_train, X_test, y_test):
@@ -188,6 +189,7 @@ class MyModel:
     def attach_model(self, model):
         """ Attach a Keras model. """
         self.model = model
+        self._compile()
 
     def load_model(self):
         """
@@ -211,12 +213,11 @@ class MyModel:
             monitor="val_accuracy", factor=0.5, patience=5, min_delta=0.01,
             verbose=verbose
         )
-        # early_stop = EarlyStopping(
-            # monitor="val_accuracy", patience=15, verbose=1, restore_best_weights=True
-        # )
+        early_stop = EarlyStopping(
+            monitor="val_accuracy", patience=15, verbose=verbose, restore_best_weights=True
+        )
 
-        # callbacks_list = [checkpoint_callback, reducelr_callback, early_stop]
-        callbacks_list = [checkpoint_callback, reducelr_callback]
+        callbacks_list = [checkpoint_callback, reducelr_callback, early_stop]
 
         self.history = self.model.fit(
             x=self.X_train,
@@ -245,10 +246,12 @@ class MyModel:
                 y=self.y_train,
                 verbose=verbose)
         print("Testing set")
-        self.model.evaluate(
+        _, accuracy = self.model.evaluate(
                 x=self.X_test,
                 y=self.y_test,
                 verbose=verbose)
+
+        return accuracy
 
     def plot_history(self):
         plt.plot(self.history.history["accuracy"])
