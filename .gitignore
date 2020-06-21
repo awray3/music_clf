@@ -1,5 +1,4 @@
 # custom project stuff:
-/data/
 *.mp3
 *.zip
 *.html
@@ -113,5 +112,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# models
+# directories models
 /models/
+/resources/
+/data/
