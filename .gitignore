@@ -115,7 +115,7 @@ venv.bak/
 # directories models
 /models/
 /resources/
-/data.nosync/
+/data/
 
 # vscode
 .vscode 
