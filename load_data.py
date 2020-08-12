@@ -20,7 +20,7 @@ def load_mappings(json_path):
     return data["mappings"]
 
 
-def load_data(json_path, test_split=0.1, valid_split=0.2):
+def load_data(json_path, test_split=0.1, valid_split=0.2, CNN=False):
     """
     Load in the dataset and create train/validation/test splits.
     """
@@ -39,6 +39,11 @@ def load_data(json_path, test_split=0.1, valid_split=0.2):
     X_train, X_valid, y_train, y_valid = train_test_split(
         X_train, y_train, test_size=valid_split, random_state=2
     )
+
+    if CNN:
+        X_train = X_train[..., np.newaxis]
+        X_valid = X_valid[..., np.newaxis]
+        X_test = X_test[..., np.newaxis]
 
     return X_train, X_valid, X_test, y_train, y_valid, y_test
 
