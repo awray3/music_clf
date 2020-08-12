@@ -33,15 +33,13 @@ def get_confusion_matrix(model, X_test, y_test):
     """ make a confusion matrix from the model."""
 
     y_pred = np.argmax(model.predict(X_test), axis=1)
-    classes = np.argmax(y_test, axis=1)
 
-    print(confusion_matrix(classes, y_pred))
+    print(confusion_matrix(y_test, y_pred))
 
 
 def get_classification_report(model, X_test, y_test, target_names):
     """ make a classification report for the model."""
 
     y_pred = np.argmax(model.predict(X_test), axis=1)
-    classes = np.argmax(y_test, axis=1)
 
-    print(classification_report(classes, y_pred, target_names=target_names))
+    print(classification_report(y_test, y_pred, target_names=target_names))
