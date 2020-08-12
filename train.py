@@ -22,8 +22,11 @@ if __name__ == "__main__":
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_data(JSON_PATH)
 
     # create the model
+    ## logistic reg
     input_shape = X_train[0].shape
     model = create_logreg(input_shape)
+
+    # CNN
 
     # compile the model
     optim = keras.optimizers.Adam(learning_rate=0.0001)
