@@ -5,9 +5,6 @@ import os
 
 # data directory folders
 DATA_DIR = "./data"
-RAW_META_PATH = os.path.join(DATA_DIR, "fma_metadata", "tracks.csv")
-FMA_SIZE = "small"  # change this if you want to work with a different version of the FMA dataset
-FMA_DATA_PATH = os.path.join(DATA_DIR, "fma_" + FMA_SIZE)
 
 # processed data location
 JSON_PATH = os.path.join(DATA_DIR, "mfcc.json")
