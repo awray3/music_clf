@@ -1,62 +1,70 @@
 """ Train a logistic regression model on the spectrograms """
-import os
 import warnings
 
-from tensorflow.keras.regularizers import l2
-from tensorflow.keras.layers import Flatten, Dense
-from tensorflow.keras import Sequential
-from sklearn.model_selection import train_test_split
 import numpy as np
-import pandas as pd
+import tensorflow.keras as keras
 
-from model_wrapper import ModelWrapper
-from utilities import subset_data
+from config import JSON_PATH, MODEL_DIR
+from load_data import load_data, load_mappings
+from evaluation_utilities import (
+    get_classification_report,
+    get_confusion_matrix,
+    plot_history,
+)
 
 warnings.filterwarnings(action="ignore")
 
-if not os.path.exists(two_genre_path := "./models/two_class/"):
-    os.mkdir(two_genre_path)
 
-meta_path = os.path.join(".", "data", "fma_metadata", "meta_df.csv")
+def create_model(input_shape, num_genres=10):
+    """
+    create a logistic regression model.
+    """
+    model = keras.Sequential(
+        [
+            keras.layers.Flatten(input_shape=input_shape),
+            keras.layers.Dense(
+                num_genres,
+                activation="softmax",
+                kernel_regularizer=keras.regularizers.l2(0.01),
+            ),
+        ]
+    )
 
-meta_df = pd.read_csv(os.path.join(meta_path), index_col=0)
+    return model
 
-input_shape = np.load(meta_df["mel_path"].iloc[0])["arr_0"].shape + (1,)
 
-genre_sublist = ["Rock", "Hip-Hop"]
+if __name__ == "__main__":
 
-# Load the melspectrograms
-X, y = subset_data(meta_df, genre_sublist, n_samples=1996)
+    # load data
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data(JSON_PATH)
 
-# train-valid-test split
-X_train_valid, X_test, y_train_valid, y_test = train_test_split(
-    X, y, random_state=1, shuffle=True, test_size=0.1
-)
-X_train, X_valid, y_train, y_valid = train_test_split(
-    X_train_valid, y_train_valid, random_state=1, test_size=0.1
-)
+    # create the model
+    input_shape = X_train[0].shape
+    model = create_model(input_shape)
 
-logreg_path = os.path.join(two_genre_path, "logreg/")
-logistic_reg = ModelWrapper(
-    batch_size=32,
-    model_dir=logreg_path,
-    genre_labels=genre_sublist,
-    X_train=X_train,
-    y_train=y_train,
-    X_valid=X_valid,
-    y_valid=y_valid,
-    X_test=X_test,
-    y_test=y_test,
-)
+    # compile the model
+    optim = keras.optimizers.Adam(learning_rate=0.0001)
+    model.compile(
+        optimizer=optim, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+    )
 
-logistic_reg_model = Sequential(
-    [
-        Flatten(input_shape=input_shape),
-        Dense(2, activation="softmax", kernel_regularizer=l2(0.01)),
-    ]
-)
+    model.summary()
 
-logistic_reg.attach_model(logistic_reg_model)
-logistic_reg.summary()
-logistic_reg.fit(num_epochs=50, verbose=0)
-logistic_reg.plot_history()
+    # train the model
+    history = model.fit(
+        X_train, y_train, validation_data=(X_valid, y_valid), epochs=30, batch_size=32
+    )
+
+    # evaluate the model
+    loss, acc = model.evaluate(X_test, y_test, verbose=1)
+
+    print(f"Test accuracy: {acc}, test loss: {loss}")
+
+    # view reports
+    get_confusion_matrix(model, X_test, y_test)
+    get_classification_report(
+        model, X_test, y_test, target_names=load_mappings(JSON_PATH)
+    )
+
+    # plot history
+    plot_history(history)
