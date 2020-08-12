@@ -27,17 +27,28 @@ This will allow us to load `.mp3` and `.wav` files.
 
 ### Preprocessing
 
-Once you have downloaded the GTZAN dataset, run the preprocessing script
+Once you have downloaded the GTZAN dataset, run the preprocessing script:
 
 	python preprocess.py
 
+This script will extract MFCCs (mel-frequency cepstral coefficients) from the `.wav` files and store the 
+data and labels in a `.json` file.
+
 ### Training
 
-You can view available models to train in the `models.py` file. Currently there is logistic regression and a convolutional neural network avialable to train. Modify the model creation section in `train.py` and run
+You can view available models to train in the `models.py` file.
+Currently there is logistic regression and a convolutional neural network avialable to train.
+Modify the model creation section in `train.py` and run
 
 	python train.py
 
 which will give you a model summary, training information, and evaluation diagnostics.
 
 
+
+# Roadmap
+
+- [x] Refactor code into scripts
+- [] Create prediction scripts
+- [] Productionize
 
