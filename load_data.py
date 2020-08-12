@@ -12,6 +12,14 @@ from config import JSON_PATH, DATA_OPTION
 def load_mappings(json_path):
     """
     get the mappings from the json file.
+    
+    Inputs:
+
+    json_path: str, path to json file to be loaded
+
+    Outputs:
+
+    List of genres.
     """
 
     with open(json_path, "r") as fp:
@@ -23,6 +31,19 @@ def load_mappings(json_path):
 def load_data(json_path, test_split=0.1, valid_split=0.2, CNN=False):
     """
     Load in the dataset and create train/validation/test splits.
+
+    Inputs:
+
+    json_path: str, path to json file to be loaded
+    test_split: float, default 0.1. Fraction (between 0 and 1) of the data to be split into the test set.
+    valid_split: float, default, 0.2. Fraction (between 0 and 1) of the train set to be split into the validation set.
+    CNN: bool, default False. If True, adds a channel dimension to X_train/X_valid/X_test so as to be compatible with a 
+    convolutional neural network architecture.
+
+    Outputs:
+
+    X_train, X_test, X_valid: numpy arrays of processed data (MFCCs or melspectrograms).
+    y_train, y_test, y_valid: numpy arrays of integers (targets).
     """
 
     with open(json_path, "r") as fp:
