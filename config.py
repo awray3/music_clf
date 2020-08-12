@@ -5,6 +5,7 @@ import os
 
 # data directory folders
 DATA_DIR = "./data"
+MODEL_DIR = "./models"
 
 # mfcc or melspectrogram?
 DATA_OPTION = "mfcc"
