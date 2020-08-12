@@ -12,7 +12,15 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 
 def plot_history(history):
-    """ plots the history of the last training cycle """
+    """
+    Plots the training history.
+
+    Inputs:
+    history, a history object output from calling model.fit() in the Keras API.
+
+    Outputs:
+    None
+    """
     plt.plot(history.history["accuracy"])
     plt.plot(history.history["val_accuracy"])
     plt.title("Model accuracy")
@@ -32,7 +40,18 @@ def plot_history(history):
 
 
 def get_confusion_matrix(model, X_test, y_test):
-    """ make a confusion matrix from the model."""
+    """
+    Make a confusion matrix from the model.
+    
+    Inputs:
+
+    model: a (trained) Keras model object.
+    X_test: a numpy array of test inputs
+    y_test: a numpy array of test labels (integers between 0 and NUM_GENRES). 
+
+    Outputs:
+    None
+    """
 
     y_pred = np.argmax(model.predict(X_test), axis=1)
 
@@ -40,7 +59,19 @@ def get_confusion_matrix(model, X_test, y_test):
 
 
 def get_classification_report(model, X_test, y_test, target_names):
-    """ make a classification report for the model."""
+    """
+    Make a classification report for the model.
+    
+    Inputs:
+
+    model: a (trained) Keras model object.
+    X_test: a numpy array of test inputs
+    y_test: a numpy array of test labels (integers between 0 and NUM_GENRES).
+    target_names: list of genres to map labels back to genre names.
+
+    Outputs:
+    None
+    """
 
     y_pred = np.argmax(model.predict(X_test), axis=1)
 
