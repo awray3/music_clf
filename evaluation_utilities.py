@@ -1,7 +1,9 @@
 """
 Evaluation utilities.
 
-plot_history: view the training results.
+plot_history: view the training accuracy and loss.
+get_confusion_matrix: prints out a confusion matrix for the test data.
+get_classification_report: prints out a classification report for the test data.
 """
 import numpy as np
 import matplotlib.pyplot as plt
