@@ -18,162 +18,94 @@ from config import (
 )
 
 
-def read_metadata_file(raw_metadata_path, fma_size):
+def save_mfcc(
+    dataset_path,
+    json_path,
+    option="mfcc",
+    n_mfcc=13,
+    n_fft=2048,
+    hop_length=512,
+    num_segments=5,
+    n_mels=128,
+    fmax=SAMPLE_RATE // 2,
+):
     """
-    read in the raw metadata file from the FMA dataset trims it.
-    Output: pandas dataframe with two columns: genre and track id.
-    """
+    Save the mfccs in a json path. Also split each sample up.
 
-    # load in the whole metadata file
-    all_metadata = pd.read_csv(raw_metadata_path, header=[0, 1], index_col=0)
-
-    # Genre column
-    genre_col = [("track", "genre_top")]
-
-    # select out the tracks for the current dataset along with genre
-    df = all_metadata.loc[all_metadata[("set", "subset")] == fma_size, genre_col]
-
-    # make track ID into its own column
-    df.reset_index(inplace=True)
-
-    # rename the columns
-    df.columns = ["track_id", "genre"]
-
-    # converrt the ID to a string padded to a length of 6 with zeros. This makes it so that
-    # the first three characters of the ID string are the subfolder and all 6 form the file name.
-    df["track_id"] = df["track_id"].apply(lambda x: str(x).zfill(6))
-
-    # # Remove bad mp3s from the dataframe so that we skip them.
-    # if df.mp3_path.isin(bad_filepaths).sum():
-    #     df.drop(
-    #         df.loc[df.mp3_path.isin(bad_filepaths), :].index,
-    #         inplace=True
-    #     )
-    #     print(f"Dropped {len(bad_filepaths)} rows from the dataframe.")
-
-    # df['duration'] = df['mp3_path'].apply(lambda x:
-    #                                       librosa.get_duration(filename=x))
-
-    return df
-
-
-def save_mfcc(meta_df, json_path, num_chunks=5, n_mfcc=13, n_fft=2048, hop_length=512):
-    """
-    Load waveforms and extract MFCCs. Splits each track into chunks `num_chunks` times. 
+    option: can be either "mfcc" or "melspectrogram".
     """
 
-    samples_per_chunk = int(SAMPLES_PER_TRACK / num_chunks)
-    expected_chunk_length = math.ceil(samples_per_chunk / hop_length)
+    # dictionary to store data
+    data = {"mappings": [], "labels": [], option: []}
 
-    # initialize the data dictionary
-    data = {"genre": [], "label": [], "mfcc": []}
+    num_samples_per_segment = int(SAMPLES_PER_TRACK / num_segments)
 
-    # get the list of genres
-    data["genre"] = meta_df["genre"].unique().tolist()
+    expected_length_of_segment = math.ceil(num_samples_per_segment / hop_length)
 
-    # encode the labels into the dataframe
-    meta_df["genre_enc"] = meta_df["genre"].apply(data["genre"].index)
+    # loop through all genres
+    for i, (dirpath, _, filenames) in enumerate(os.walk(dataset_path)):
 
-    # loop through the meta_df array
-    for idx, row in meta_df.iterrows():
+        # ensure not in root level
+        if dirpath is not dataset_path:
 
-        # get the mp3 file location from the track id
-        track_path = os.path.join(
-            FMA_DATA_PATH, row["track_id"][:3], row["track_id"] + ".mp3"
-        )
+            # save the semantic (genre) label
+            genre = dirpath.split("/")[-1]
+            data["mappings"].append(genre)
 
-        try:  # in case of import errors, e.g. corrupted data files
+            print(f"Processing {genre}")
+            # process files for specific genre
+            for f in filenames:
 
-            # load the waveform for that track
-            waveform, _ = librosa.load(track_path)
+                # load audio file
+                file_path = os.path.join(dirpath, f)
 
-            print(len(waveform))
-            # skip the track if it is too short
-            # if len(waveform) < SAMPLES_PER_TRACK:
-            #     continue
+                waveform, _ = librosa.load(file_path)
 
-            for s in range(num_chunks):
-                start_idx = s * samples_per_chunk
-                end_idx = start_index + samples_per_chunk
+                # process segments extracting mfcc and storing data
 
-                # get the mfccs
-                mfcc = librosa.feature.mfcc(
-                    waveform[start_idx:end_idx],
-                    n_mfcc=n_mfcc,
-                    n_fft=n_fft,
-                    hop_length=hop_length,
-                )
-                mfcc = mfcc.T
+                for s in range(num_segments):
+                    start_sample = num_samples_per_segment * s
+                    end_sample = start_sample + num_samples_per_segment
 
-                print(f"Length of mfcc: {len(mfcc)}, expected: {expected_chunk_length}")
+                    if option is "mfcc":
+                        mfcc = librosa.feature.mfcc(
+                            waveform[start_sample:end_sample],
+                            n_mfcc=n_mfcc,
+                            n_fft=n_fft,
+                            hop_length=hop_length,
+                        )
 
-                if len(mfcc) == expected_chunk_length:
-                    # convert to list from numpy array
-                    data["mfcc"].append(mfcc.tolist())
-                    data["label"].append(row["genre_enc"])
+                        feature_to_export = mfcc.T
+                    elif option is "melspectrogram":
+                        # option is melspectrogram
+                        melspec = librosa.feature.melspectrogram(
+                            waveform[start_sample:end_sample],
+                            n_mels=n_mels,
+                            n_fft=n_fft,
+                            hop_length=hop_length,
+                            fmax=fmax,
+                        )
+                        feature_to_export = melspec.T
+                    else:
+                        raise ValueError(
+                            "option needs to be either melspectrogram or mfcc."
+                        )
 
-                    print(
-                        f"Processing track {row['track_id']}, chunk {s+1}, label {row['genre_enc']}"
-                    )
-        except:
-            pass
+                    # store mfcc for segment if it has expected length
+                    if len(feature_to_export) == expected_length_of_segment:
+                        data[option].append(feature_to_export.tolist())
+                        data["labels"].append(i - 1)
 
-    with open(JSON_PATH, "w") as fp:
+                    print(f"Processed {f}, segment{s+1}, label {i-1}")
+
+    with open(json_path, "w") as fp:
         json.dump(data, fp, indent=4)
 
 
 if __name__ == "__main__":
+    # for loading MFCCs
+    save_mfcc(DATASET_PATH, MFCC_JSON_PATH, num_segments=10, option="mfcc")
 
-    # extract the track id and genre info from the metadata csv
-    meta_df = read_metadata_file(RAW_META_PATH, FMA_SIZE)
-
-    # Load in the MFCCs and save the data in a JSON file.
-    save_mfcc(meta_df, JSON_PATH)
-
-    # setup audio directories
-    # audio_dir = os.path.join(".", "data", "fma_small/")
-    # raw_metadata_path = os.path.join(".", "data", "fma_metadata", "tracks.csv")
-    # target_metadata_path = os.path.join(".", "data", "fma_metadata", "meta_df.csv")
-
-    # melspec_dir = os.path.join(".", "data", "fma_small_melspecs")
-
-    # #  Make the folders for the given models:
-    # if not os.path.exists("./models/"):
-    #     os.mkdir("./models/")
-
-    # # check if the path exists and exit if it doesn't.
-    # if not os.path.exists(raw_metadata_path):
-    #     raise FileNotFoundError(
-    #         "Data directory or metadata file not found; check it is in the correct place."
-    #     )
-
-    # # check if the metadata file has already been created
-    # if os.path.exists(target_metadata_path):
-    #     raise FileExistsError(
-    #         "Metadata file exists. Double check that the \
-    #         preprocessing hasn't already been executed."
-    #     )
-
-    # filepaths = librosa.util.find_files(audio_dir)
-
-    # # Extract bad files using torchaudio
-    # bad_files = []
-    # for file in filepaths:
-    #     try:
-    #         info_obj = info(file)[0]
-    #     except RuntimeError:
-    #         bad_files.append(file)
-
-    # # runs the preprocessing of the data file and conversion to melspecs
-    # meta_df = read_metadata_file(raw_metadata_path, filepaths, bad_files)
-
-    # # delete samples less than 30 seconds
-    # meta_df.drop(meta_df.loc[(meta_df.duration < 28), :].index, axis=0, inplace=True)
-
-    # meta_df["mel_path"] = meta_df["mp3_path"].apply(
-    #     lambda path: os.path.join(melspec_dir, id_from_path(path) + ".npz")
-    # )
-
-    # meta_df = attach_onehot_encoding(meta_df)
-
-    # meta_df.to_csv(target_metadata_path)
+    # for loading melspectrograms
+    # save_mfcc(DATASET_PATH, MELSPEC_JSON_PATH,
+    #           num_segments=10, option="melspectrogram")
