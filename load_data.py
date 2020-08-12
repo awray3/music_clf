@@ -9,6 +9,17 @@ from sklearn.model_selection import train_test_split
 from config import JSON_PATH, DATA_OPTION
 
 
+def load_mappings(json_path):
+    """
+    get the mappings from the json file.
+    """
+
+    with open(json_path, "r") as fp:
+        data = json.load(fp)
+
+    return data["mappings"]
+
+
 def load_data(json_path, test_split=0.1, valid_split=0.2):
     """
     Load in the dataset and create train/validation/test splits.
