@@ -11,22 +11,25 @@ from evaluation_utilities import (
     get_confusion_matrix,
     plot_history,
 )
-from models import create_logreg
+from models import create_logreg, create_CNN
 
 warnings.filterwarnings(action="ignore")
 
 
 if __name__ == "__main__":
 
-    # load data
-    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data(JSON_PATH)
+    # load data; set CNN=True to add channel axis to X.
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data(JSON_PATH, CNN=True)
 
     # create the model
-    ## logistic reg
-    input_shape = X_train[0].shape
-    model = create_logreg(input_shape)
+    input_shape = X_train.shape[1:]
+    print(f"input shape: {input_shape}")
 
-    # CNN
+    ## logistic reg
+    # model = create_logreg(input_shape)
+
+    ## CNN
+    model = create_CNN(input_shape)
 
     # compile the model
     optim = keras.optimizers.Adam(learning_rate=0.0001)
