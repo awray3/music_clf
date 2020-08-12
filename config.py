@@ -6,8 +6,12 @@ import os
 # data directory folders
 DATA_DIR = "./data"
 
+# mfcc or melspectrogram?
+DATA_OPTION = "mfcc"
+
 # processed data location
-JSON_PATH = os.path.join(DATA_DIR, "mfcc.json")
+JSON_PATH = os.path.join(DATA_DIR, DATA_OPION + ".json")
+
 
 # waveform properties
 SAMPLE_RATE = 22050
