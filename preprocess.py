@@ -14,13 +14,14 @@ from config import (
     DURATION,
     SAMPLES_PER_TRACK,
     JSON_PATH,
+    DATA_OPTION,
 )
 
 
 def save_mfcc(
     dataset_path,
     json_path,
-    option="mfcc",
+    option=DATA_OPTION,
     n_mfcc=13,
     n_fft=2048,
     hop_length=512,
@@ -106,9 +107,4 @@ def save_mfcc(
 
 
 if __name__ == "__main__":
-    # for loading MFCCs
-    save_mfcc(DATA_DIR, JSON_PATH, num_segments=10, option="mfcc")
-
-    # for loading melspectrograms
-    # save_mfcc(DATASET_PATH, MELSPEC_JSON_PATH,
-    #           num_segments=10, option="melspectrogram")
+    save_mfcc(DATA_DIR, JSON_PATH, num_segments=10)
