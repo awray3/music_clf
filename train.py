@@ -1,7 +1,7 @@
 """ Train a logistic regression model on the spectrograms """
+import os
 import warnings
 
-import numpy as np
 import tensorflow.keras as keras
 
 from config import JSON_PATH, MODEL_DIR
@@ -11,26 +11,9 @@ from evaluation_utilities import (
     get_confusion_matrix,
     plot_history,
 )
+from models import create_logreg
 
 warnings.filterwarnings(action="ignore")
-
-
-def create_model(input_shape, num_genres=10):
-    """
-    create a logistic regression model.
-    """
-    model = keras.Sequential(
-        [
-            keras.layers.Flatten(input_shape=input_shape),
-            keras.layers.Dense(
-                num_genres,
-                activation="softmax",
-                kernel_regularizer=keras.regularizers.l2(0.01),
-            ),
-        ]
-    )
-
-    return model
 
 
 if __name__ == "__main__":
@@ -40,7 +23,7 @@ if __name__ == "__main__":
 
     # create the model
     input_shape = X_train[0].shape
-    model = create_model(input_shape)
+    model = create_logreg(input_shape)
 
     # compile the model
     optim = keras.optimizers.Adam(learning_rate=0.0001)
@@ -48,6 +31,7 @@ if __name__ == "__main__":
         optimizer=optim, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
     )
 
+    # view model summary
     model.summary()
 
     # train the model
@@ -68,3 +52,7 @@ if __name__ == "__main__":
 
     # plot history
     plot_history(history)
+
+    # save model (optional)
+    model_dir = os.path.join(MODEL_DIR, "model.h5")
+    model.save(model_dir)
