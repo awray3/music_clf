@@ -1,4 +1,6 @@
-""" processes metadata into a simpler metdata file."""
+"""
+processes data by extracting MFCCs or melspectrograms and store in a json file.
+"""
 
 import os
 import math
@@ -11,7 +13,6 @@ import librosa
 from config import (
     DATA_DIR,
     SAMPLE_RATE,
-    DURATION,
     SAMPLES_PER_TRACK,
     JSON_PATH,
     DATA_OPTION,
@@ -32,7 +33,7 @@ def save_mfcc(
     """
     Save the mfccs or melspectrograms in a json file. Also split each sample up in to chunks.
 
-    option: can be either "mfcc" or "melspectrogram". 
+    option: can be either "mfcc" or "melspectrogram".
     """
 
     # dictionary to store data
