@@ -10,7 +10,7 @@ DATA_DIR = "./data"
 DATA_OPTION = "mfcc"
 
 # processed data location
-JSON_PATH = os.path.join(DATA_DIR, DATA_OPION + ".json")
+JSON_PATH = os.path.join(DATA_DIR, DATA_OPTION + ".json")
 
 
 # waveform properties
