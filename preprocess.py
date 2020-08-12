@@ -4,13 +4,12 @@ import os
 import math
 import json
 
+import numpy as np
 import pandas as pd
 import librosa
 
 from config import (
-    RAW_META_PATH,
-    FMA_SIZE,
-    FMA_DATA_PATH,
+    DATA_DIR,
     SAMPLE_RATE,
     DURATION,
     SAMPLES_PER_TRACK,
@@ -30,9 +29,9 @@ def save_mfcc(
     fmax=SAMPLE_RATE // 2,
 ):
     """
-    Save the mfccs in a json path. Also split each sample up.
+    Save the mfccs or melspectrograms in a json file. Also split each sample up in to chunks.
 
-    option: can be either "mfcc" or "melspectrogram".
+    option: can be either "mfcc" or "melspectrogram". 
     """
 
     # dictionary to store data
@@ -53,6 +52,7 @@ def save_mfcc(
             data["mappings"].append(genre)
 
             print(f"Processing {genre}")
+
             # process files for specific genre
             for f in filenames:
 
@@ -67,7 +67,7 @@ def save_mfcc(
                     start_sample = num_samples_per_segment * s
                     end_sample = start_sample + num_samples_per_segment
 
-                    if option is "mfcc":
+                    if option == "mfcc":
                         mfcc = librosa.feature.mfcc(
                             waveform[start_sample:end_sample],
                             n_mfcc=n_mfcc,
@@ -76,7 +76,7 @@ def save_mfcc(
                         )
 
                         feature_to_export = mfcc.T
-                    elif option is "melspectrogram":
+                    elif option == "melspectrogram":
                         # option is melspectrogram
                         melspec = librosa.feature.melspectrogram(
                             waveform[start_sample:end_sample],
@@ -92,7 +92,10 @@ def save_mfcc(
                         )
 
                     # store mfcc for segment if it has expected length
-                    if len(feature_to_export) == expected_length_of_segment:
+                    if (
+                        len(feature_to_export) == expected_length_of_segment
+                    ) and np.any(feature_to_export):
+
                         data[option].append(feature_to_export.tolist())
                         data["labels"].append(i - 1)
 
@@ -104,7 +107,7 @@ def save_mfcc(
 
 if __name__ == "__main__":
     # for loading MFCCs
-    save_mfcc(DATASET_PATH, MFCC_JSON_PATH, num_segments=10, option="mfcc")
+    save_mfcc(DATA_DIR, JSON_PATH, num_segments=10, option="mfcc")
 
     # for loading melspectrograms
     # save_mfcc(DATASET_PATH, MELSPEC_JSON_PATH,
