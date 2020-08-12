@@ -1,31 +1,47 @@
 """ processes metadata into a simpler metdata file."""
 
 import os
+import math
+import json
 
 import pandas as pd
 import librosa
-from torchaudio import info
 
-from utilities import id_from_path
+from config import (
+    RAW_META_PATH,
+    FMA_SIZE,
+    FMA_DATA_PATH,
+    SAMPLE_RATE,
+    DURATION,
+    SAMPLES_PER_TRACK,
+    JSON_PATH,
+)
 
-RAW_META_PATH = "./data/fma_metadata/tracks.csv"
-JSON_PATH = "./data/mfcc.json"
 
-
-def read_metadata_file(raw_metadata_path, fma_size="small"):
+def read_metadata_file(raw_metadata_path, fma_size):
     """
     read in the raw metadata file from the FMA dataset trims it.
     Output: pandas dataframe with two columns: genre and track id.
     """
-    all_metadata = pd.read_csv(path, header=[0, 1], index_col=0)
 
-    cols_to_keep = [("track", "genre_top")]
+    # load in the whole metadata file
+    all_metadata = pd.read_csv(raw_metadata_path, header=[0, 1], index_col=0)
 
-    # This will be the main dataframe for here on out:
-    df = all_metadata.loc[all_metadata[("set", "subset")] == fma_size, cols_to_keep]
+    # Genre column
+    genre_col = [("track", "genre_top")]
 
+    # select out the tracks for the current dataset along with genre
+    df = all_metadata.loc[all_metadata[("set", "subset")] == fma_size, genre_col]
+
+    # make track ID into its own column
     df.reset_index(inplace=True)
+
+    # rename the columns
     df.columns = ["track_id", "genre"]
+
+    # converrt the ID to a string padded to a length of 6 with zeros. This makes it so that
+    # the first three characters of the ID string are the subfolder and all 6 form the file name.
+    df["track_id"] = df["track_id"].apply(lambda x: str(x).zfill(6))
 
     # # Remove bad mp3s from the dataframe so that we skip them.
     # if df.mp3_path.isin(bad_filepaths).sum():
@@ -41,16 +57,78 @@ def read_metadata_file(raw_metadata_path, fma_size="small"):
     return df
 
 
+def save_mfcc(meta_df, json_path, num_chunks=5, n_mfcc=13, n_fft=2048, hop_length=512):
+    """
+    Load waveforms and extract MFCCs. Splits each track into chunks `num_chunks` times. 
+    """
+
+    samples_per_chunk = int(SAMPLES_PER_TRACK / num_chunks)
+    expected_chunk_length = math.ceil(samples_per_chunk / hop_length)
+
+    # initialize the data dictionary
+    data = {"genre": [], "label": [], "mfcc": []}
+
+    # get the list of genres
+    data["genre"] = meta_df["genre"].unique().tolist()
+
+    # encode the labels into the dataframe
+    meta_df["genre_enc"] = meta_df["genre"].apply(data["genre"].index)
+
+    # loop through the meta_df array
+    for idx, row in meta_df.iterrows():
+
+        # get the mp3 file location from the track id
+        track_path = os.path.join(
+            FMA_DATA_PATH, row["track_id"][:3], row["track_id"] + ".mp3"
+        )
+
+        try:  # in case of import errors, e.g. corrupted data files
+
+            # load the waveform for that track
+            waveform, _ = librosa.load(track_path)
+
+            print(len(waveform))
+            # skip the track if it is too short
+            # if len(waveform) < SAMPLES_PER_TRACK:
+            #     continue
+
+            for s in range(num_chunks):
+                start_idx = s * samples_per_chunk
+                end_idx = start_index + samples_per_chunk
+
+                # get the mfccs
+                mfcc = librosa.feature.mfcc(
+                    waveform[start_idx:end_idx],
+                    n_mfcc=n_mfcc,
+                    n_fft=n_fft,
+                    hop_length=hop_length,
+                )
+                mfcc = mfcc.T
+
+                print(f"Length of mfcc: {len(mfcc)}, expected: {expected_chunk_length}")
+
+                if len(mfcc) == expected_chunk_length:
+                    # convert to list from numpy array
+                    data["mfcc"].append(mfcc.tolist())
+                    data["label"].append(row["genre_enc"])
+
+                    print(
+                        f"Processing track {row['track_id']}, chunk {s+1}, label {row['genre_enc']}"
+                    )
+        except:
+            pass
+
+    with open(JSON_PATH, "w") as fp:
+        json.dump(data, fp, indent=4)
+
+
 if __name__ == "__main__":
 
-    data = {"genres": [], "labels": [], "mfccs": []}
-
     # extract the track id and genre info from the metadata csv
-    df = read_metadata_file()
+    meta_df = read_metadata_file(RAW_META_PATH, FMA_SIZE)
 
-    # Load in the MFCCs
-
-    # Save the JSON file
+    # Load in the MFCCs and save the data in a JSON file.
+    save_mfcc(meta_df, JSON_PATH)
 
     # setup audio directories
     # audio_dir = os.path.join(".", "data", "fma_small/")
