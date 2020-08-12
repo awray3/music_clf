@@ -1,20 +1,16 @@
 # Music CLF
-Preprocessing and deep learning models for music genre classification.
+Genre classification using the [GTZAN](http://marsyas.info/downloads/datasets.html) dataset.
 
-This project was inspired by the [FMA dataset](https://github.com/mdeff/fma) and analysis done by [Priya Dwivedi](https://towardsdatascience.com/using-cnns-and-rnns-for-music-genre-recognition-2435fb2ed6af).
+This project was inspired by the [FMA dataset](https://github.com/mdeff/fma), though due to 
+technical issues with this dataset I decided to instead use the GTZAN dataset.
 
 # Installation
 
-Follow these steps if you wish to work with the notebook on your own machine.
+Follow these steps if you wish to use these scripts on your own machine.
 
-## Directory Management
+## Training
 
-Within a clone of this repository create a new folder called `data`.
-Obtain the FMA dataset (I used the "small" version) and metadata zip files
-from their repository linked above. Unzip them in this folder.
-You should now have folders `data/fma_small/` and `data/fma_metadata`.
-
-## Environment setup
+### Environment setup
 
 Create a new anaconda environment:
 
@@ -27,20 +23,21 @@ Then install the prerequisites:
 	pip install -r requirements.txt
 
 Note: `ffmpeg` is a tool for working with audio data that is used by the python package `librosa`, which will be used for audio processing.
-This will allow us to work with `.mp3` files, `.wav` files, and more 
-within python.
+This will allow us to load `.mp3` and `.wav` files.
 
-## Preprocessing
+### Preprocessing
 
-There are two preprocessing steps. The script `metadata_preprocess.py`
-processes the metadata files given from the FMA dataset, and 
-`mp3_to_melspec.py` converts the mp3 files into melspectrograms saved
-as numpy files (`.npz`).
+Once you have downloaded the GTZAN dataset, run the preprocessing script
 
-	python metadata_preprocess.py
-	python mp3_to_melspec.py
+	python preprocess.py
 
-# Roadmap
-	
-* Study working models on small datasets
+### Training
+
+You can view available models to train in the `models.py` file. Currently there is logistic regression and a convolutional neural network avialable to train. Modify the model creation section in `train.py` and run
+
+	python train.py
+
+which will give you a model summary, training information, and evaluation diagnostics.
+
+
 
