@@ -49,6 +49,6 @@ which will give you a model summary, training information, and evaluation diagno
 # Roadmap
 
 - [x] Refactor code into scripts
-- [] Create prediction scripts
-- [] Productionize
+- [ ] Create prediction scripts
+- [ ] Productionize
 
