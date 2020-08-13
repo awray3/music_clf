@@ -16,6 +16,7 @@ from config import (
     SAMPLES_PER_TRACK,
     JSON_PATH,
     DATA_OPTION,
+    NUM_SEGMENTS,
 )
 
 
@@ -108,4 +109,4 @@ def save_mfcc(
 
 
 if __name__ == "__main__":
-    save_mfcc(DATA_DIR, JSON_PATH, num_segments=10)
+    save_mfcc(DATA_DIR, JSON_PATH, num_segments=NUM_SEGMENTS)

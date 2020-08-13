@@ -15,6 +15,7 @@ JSON_PATH = os.path.join(DATA_DIR, DATA_OPTION + ".json")
 
 # dataset properties
 NUM_GENRES = 10
+NUM_SEGMENTS = 10
 
 # waveform properties
 SAMPLE_RATE = 22050
