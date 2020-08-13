@@ -16,7 +16,7 @@ def create_logreg(input_shape, num_genres=NUM_GENRES):
     num_genres: default NUM_GENRES, the number of genres.
 
     Output:
-    model: a logistic regression model. 
+    model: a logistic regression model.
     """
     model = keras.Sequential(
         [
@@ -35,16 +35,16 @@ def create_logreg(input_shape, num_genres=NUM_GENRES):
 def create_CNN(input_shape, filters=32, num_genres=NUM_GENRES):
     """
     Create a convolutional neural network object.
-    
+
     Inputs:
 
     input_shape: tuple, shape of non-batch dimensions of X_train, X_valid, and X_test.
     filters: int, default 32. Number of filters for each convolutional layer.
-    num_genres: default NUM_GENRES, the number of genres. 
+    num_genres: default NUM_GENRES, the number of genres.
 
     Output:
 
-    model: a convolutional neural network model object 
+    model: a convolutional neural network model object
     """
 
     model = keras.Sequential()
@@ -98,4 +98,3 @@ def create_CNN(input_shape, filters=32, num_genres=NUM_GENRES):
     model.add(keras.layers.Dense(num_genres, activation="softmax"))
 
     return model
-
