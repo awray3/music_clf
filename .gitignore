@@ -1,4 +1,5 @@
 # custom project stuff:
+.vimrc
 *.mp3
 *.zip
 *.html
