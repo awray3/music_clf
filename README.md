@@ -4,7 +4,7 @@ Genre classification using the [GTZAN](http://marsyas.info/downloads/datasets.ht
 This project was inspired by the [FMA dataset](https://github.com/mdeff/fma), though due to 
 technical issues with this dataset I decided to instead use the GTZAN dataset.
 
-# Installation
+# Usage
 
 Follow these steps if you wish to use these scripts on your own machine.
 
