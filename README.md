@@ -8,6 +8,19 @@ technical issues with this dataset I decided to instead use the GTZAN dataset.
 
 Follow these steps if you wish to use these scripts on your own machine.
 
+## Testing the server
+
+If you want to test the server functionality, follow these steps. Run the server:
+
+	cd server/flask
+	python server.py
+
+Then in a new terminal run 
+
+	python local/client.py
+
+This can be run on any audio file. To change the audio file adjust the path variable `TEST_AUDIO_FILE` inside of `client.py`. You should then see the prediction.
+
 ## Training
 
 ### Environment setup
@@ -29,7 +42,7 @@ This will allow us to load `.mp3` and `.wav` files.
 
 Once you have downloaded the GTZAN dataset, run the preprocessing script:
 
-	python preprocess.py
+	python classifier/preprocess.py
 
 This script will extract MFCCs (mel-frequency cepstral coefficients) from the `.wav` files and store the 
 data and labels in a `.json` file.
@@ -40,15 +53,16 @@ You can view available models to train in the `models.py` file.
 Currently there is logistic regression and a convolutional neural network avialable to train.
 Modify the model creation section in `train.py` and run
 
-	python train.py
+	python classifier/train.py
 
-which will give you a model summary, training information, and evaluation diagnostics.
-
-
+which will give you a model summary, training information, and evaluation diagnostics. 
 
 # Roadmap
 
 - [x] Refactor code into scripts
-- [ ] Create prediction scripts
-- [ ] Productionize
+- [x] Get Flask server working
+- [x] Ping server with client
+- [ ] Add uwsgi layer
+- [ ] Add nginx layer
+- [ ] Build docker files and images
 
