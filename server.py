@@ -1,5 +1,5 @@
 """
-Flask server 
+Flask server
 """
 
 import os
