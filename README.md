@@ -8,6 +8,13 @@ technical issues with this dataset I decided to instead use the GTZAN dataset.
 
 Follow these steps if you wish to use these scripts on your own machine.
 
+## Environment Setup
+
+Install the prerequisites by creating a new anaconda environment:
+
+	conda env create -f environment.yml
+	conda activate genre_rec
+
 ## Testing the Flask Server
 
 If you want to test the server functionality with just a local flask server, follow these steps. Run the server:
@@ -23,12 +30,7 @@ This can be run on any audio file. To change the audio file adjust the path vari
 
 ## Training
 
-### Environment setup
-
-Install the prerequisites by creating a new anaconda environment:
-
-	conda env create -f environment.yml
-	conda activate genre_rec
+These steps recreate the training process.
 
 ### Preprocessing
 
