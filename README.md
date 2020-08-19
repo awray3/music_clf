@@ -8,9 +8,9 @@ technical issues with this dataset I decided to instead use the GTZAN dataset.
 
 Follow these steps if you wish to use these scripts on your own machine.
 
-## Testing the server
+## Testing the Flask Server
 
-If you want to test the server functionality, follow these steps. Run the server:
+If you want to test the server functionality with just a local flask server, follow these steps. Run the server:
 
 	cd server/flask
 	python server.py
@@ -25,18 +25,10 @@ This can be run on any audio file. To change the audio file adjust the path vari
 
 ### Environment setup
 
-Create a new anaconda environment:
+Install the prerequisites by creating a new anaconda environment:
 
-	conda create --name genre_recognition python=3.8
-	conda activate genre_recognition
-
-Then install the prerequisites:
-
-	conda install -c conda-forge ffmpeg
-	pip install -r requirements.txt
-
-Note: `ffmpeg` is a tool for working with audio data that is used by the python package `librosa`, which will be used for audio processing.
-This will allow us to load `.mp3` and `.wav` files.
+	conda env create -f environment.yml
+	conda activate genre_rec
 
 ### Preprocessing
 
