@@ -5,7 +5,7 @@ Flask server
 import os
 import random
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 from genre_rec_service import Genre_Recognition_Service
 
@@ -38,6 +38,11 @@ def predict():
     data = {"keyword": prediction}
 
     return jsonify(data)
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
