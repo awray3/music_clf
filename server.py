@@ -16,7 +16,7 @@ app = Flask(__name__)
 def predict():
 
     # get audio file
-    audio_file = request.files["file"]
+    audio_file = request.files["UploadedAudio"]
 
     # random string of digits for file name
     file_name = str(random.randint(0, 100000))
@@ -33,11 +33,11 @@ def predict():
     # remove the file
     os.remove(file_name)
 
-    # send back the data in json format
-
-    data = {"keyword": prediction}
-
-    return jsonify(data)
+    # message to be displayed on the html webpage
+    prediction_message = f"""
+    The song is predicted to be in the {prediction} genre.
+    """
+    return render_template("index.html", prediction_text=prediction_message)
 
 
 @app.route("/")
@@ -46,4 +46,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

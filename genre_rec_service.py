@@ -18,7 +18,7 @@ from config import (
     SAMPLE_RATE,
 )
 
-SAVED_MODEL = "./models/model.h5"
+SAVED_MODEL = "./model.h5"
 
 
 def process_file(
