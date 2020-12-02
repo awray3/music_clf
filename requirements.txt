@@ -55,6 +55,7 @@ pathspec==0.8.0
 pbr==5.4.5
 pexpect==4.8.0
 pickleshare==0.7.5
+pip==20.1.1
 pooch==1.1.1
 prompt-toolkit==3.0.5
 protobuf==3.12.2
@@ -78,6 +79,7 @@ resampy==0.2.2
 rsa==4.0
 scikit-learn==0.23.1
 scipy==1.4.1
+setuptools==47.3.0.post20200616
 six==1.15.0
 smmap==3.0.4
 SoundFile==0.10.3.post1
@@ -93,7 +95,8 @@ tornado==6.0.4
 traitlets==4.3.3
 typed-ast==1.4.1
 urllib3==1.25.9
-uWSGI @ file:///Users/runner/miniforge3/conda-bld/uwsgi_1589314754489/work
+uWSGI==2.0.18
 wcwidth==0.2.4
 Werkzeug==1.0.1
+wheel==0.34.2
 wrapt==1.12.1
