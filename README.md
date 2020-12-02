@@ -56,7 +56,4 @@ which will give you a model summary, training information, and evaluation diagno
 - [x] Refactor code into scripts
 - [x] Get Flask server working
 - [x] Ping server with client
-- [ ] Add uwsgi layer
-- [ ] Add nginx layer
-- [ ] Build docker files and images
-
+- [  ] Deploy to Heroku
