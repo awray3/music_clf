@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<title>Music Genre Classification </title>
+
+<h1> Music Genre Classification </h1>
+<h3> By Andrew Wray </h3>
+
+<p style="word-wrap: break-word; width: 900px">
+    This small web app uses a neural network to predict the genre of a song you upload.
+    There are 10 possible predictions that can be given, which are
+    pop, metal, disco, blues, reggae, classical, rock, hip-hop, country, and jazz. 
+    <br>
+    <br> 
+
+    To use it, select a .mp3 or a .wav file from your computer to be 
+    fed into the genre classifier, and then click the Predict button below. 
+    <br>
+    (It may take a few seconds for the server to process for longer audio files.)
+</p>
+
+<br>
+<form action="{{ url_for('predict')}}" method="post"  enctype="multipart/form-data">
+    <input type="file" name="UploadedAudio" accept=".mp3,.wav"/>
+
+    <button type="submit", class="btn"> Predict </button>
+</form>
+<br>
+<br>
+
+{{ prediction_text }}
+
+<br>
+<br>
+<br>
+
+Check out the code on my <a href="https://github.com/awray3/music_clf">Github</a>.
+
+
+
+
+
