@@ -25,7 +25,7 @@ HOP_LENGTH = 512
 N_FFT = 2048
 
 # Segmenting Constants
-NUM_SEGMENTS = 5  # split each track into this many pieces
+NUM_SEGMENTS = 10  # split each track into this many pieces
 NUM_SAMPLES_PER_SEGMENT = int(
     SAMPLES_PER_TRACK / NUM_SEGMENTS
 )  # number of samples in each segment

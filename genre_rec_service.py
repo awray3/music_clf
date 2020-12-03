@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow.keras as keras
 
 from config import (
+    DURATION,
     NUM_SEGMENTS,
     NUM_SAMPLES_PER_SEGMENT,
     EXPECTED_SEGMENT_LENGTH,
@@ -31,9 +32,10 @@ def process_file(
     hop_length=HOP_LENGTH,
     n_mels=N_MELS,
     fmax=SAMPLE_RATE // 2,
+    duration=DURATION,
 ):
 
-    waveform, _ = librosa.load(file_path)
+    waveform, _ = librosa.load(file_path, duration=duration)
 
     feature_list = []
 
