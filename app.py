@@ -21,7 +21,7 @@ def predict():
     # random string of digits for file name
     file_name = str(random.randint(0, 100000))
 
-    # save the file
+    # save the file locally
     audio_file.save(file_name)
 
     # invoke the genre recognition service
