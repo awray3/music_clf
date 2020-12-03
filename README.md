@@ -4,9 +4,11 @@ Genre classification using the [GTZAN](http://marsyas.info/downloads/datasets.ht
 This project was inspired by the [FMA dataset](https://github.com/mdeff/fma), though due to 
 technical issues with this dataset I decided to instead use the GTZAN dataset.
 
+You can find the deployed web app on Heroku: [https://music-clf.herokuapp.com/](https://music-clf.herokuapp.com/)
+
 # Usage
 
-Follow these steps if you wish to use these scripts on your own machine.
+Follow these steps if you wish to try out the code on your own machine.
 
 ## Environment Setup
 
@@ -15,22 +17,17 @@ Install the prerequisites by creating a new anaconda environment:
 	conda env create -f environment.yml
 	conda activate genre_rec
 
-## Testing the Flask Server
+## Start the Flask server
 
 If you want to test the server functionality with just a local flask server, follow these steps. Run the server:
 
-	cd server/flask
-	python server.py
+	python app.py
 
-Then in a new terminal run 
+Then visit `localhost:5000` in your web browser.
 
-	python local/client.py
+## Model Creation
 
-This can be run on any audio file. To change the audio file adjust the path variable `TEST_AUDIO_FILE` inside of `client.py`. You should then see the prediction.
-
-## Training
-
-These steps recreate the training process.
+If you wish to recreate the training process, first download the GTZAN dataset and refer to the steps below.
 
 ### Preprocessing
 
@@ -56,4 +53,4 @@ which will give you a model summary, training information, and evaluation diagno
 - [x] Refactor code into scripts
 - [x] Get Flask server working
 - [x] Ping server with client
-- [  ] Deploy to Heroku
+- [x] Deploy to Heroku
