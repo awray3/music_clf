@@ -24,15 +24,6 @@ def predict():
     # save the file locally
     audio_file.save(file_name)
 
-    # convert to a 25 second .wav file
-    os.system(f"ffmpeg -ss 0 -i {file_name} -t 25 {file_name}.wav")
-
-    # remove the old file
-    os.remove(file_name)
-
-    # update file name to include the .wav
-    file_name = file_name + ".wav"
-
     # invoke the genre recognition service
     grs = Genre_Recognition_Service()
 
