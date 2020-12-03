@@ -24,13 +24,22 @@ def predict():
     # save the file locally
     audio_file.save(file_name)
 
+    # convert to wav file
+    os.system(f"ffmpeg -i {file_name} {file_name}.wav")
+
+    # remove the old file
+    os.remove(file_name)
+
+    # update file name to include the .wav
+    file_name = file_name + ".wav"
+
     # invoke the genre recognition service
     grs = Genre_Recognition_Service()
 
     # make prediction
     prediction = grs.predict(file_name)
 
-    # remove the file
+    # remove the .wav file
     os.remove(file_name)
 
     # message to be displayed on the html webpage
