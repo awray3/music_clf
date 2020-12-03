@@ -2,7 +2,6 @@
 .vimrc
 *.mp3
 *.zip
-*.html
 
 # mac
 *.DS_store
