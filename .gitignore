@@ -119,3 +119,8 @@ venv.bak/
 
 # vscode
 .vscode 
+
+# aws stuff
+ec2-user@ec2-52-12-25-99.us-west-2.compute.amazonaws.com/
+*.pem
+.aws_keys
