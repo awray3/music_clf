@@ -7,6 +7,12 @@ fail for large files due to the computational limits of Heroku.
 This project was inspired by the [FMA dataset](https://github.com/mdeff/fma), though due to 
 technical issues with this dataset I decided to instead use the [GTZAN](http://marsyas.info/downloads/datasets.html) dataset.
 
+The model works by starting with a song and splitting it up into ten small chunks. Each chunk is then processed by extracting mel-frequency cepstral coefficients (MFCCs) over many tiny segments, producing an image like the one below:
+
+![MFCC's for a song coming from the rock genre](./rock_mfcc.jpg)
+
+The genre is then predicted using a convolutional neural network, a typical architecture suitable for image-like data such as this.
+
 # Usage
 
 Follow these steps if you wish to try out the code on your own machine.
