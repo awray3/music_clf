@@ -1,10 +1,11 @@
-# Music CLF
-Genre classification using the [GTZAN](http://marsyas.info/downloads/datasets.html) dataset.
+# Music Genre Classification
+
+This repository contains the code for a music genre classifier written in Python using Tensorflow and Flask. 
+You can try it out for yourself on [Heroku](https://music-clf.herokuapp.com/), though be warned that it might 
+fail for large files due to the computational limits of Heroku.
 
 This project was inspired by the [FMA dataset](https://github.com/mdeff/fma), though due to 
-technical issues with this dataset I decided to instead use the GTZAN dataset.
-
-You can find the deployed web app on Heroku: [https://music-clf.herokuapp.com/](https://music-clf.herokuapp.com/)
+technical issues with this dataset I decided to instead use the [GTZAN](http://marsyas.info/downloads/datasets.html) dataset.
 
 # Usage
 
