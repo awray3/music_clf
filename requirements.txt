@@ -27,7 +27,7 @@ llvmlite==0.35.0
 Markdown==3.3.3
 MarkupSafe==1.1.1
 numba==0.52.0
-numpy==1.18.5
+numpy==1.21.0
 oauthlib==3.1.0
 opt-einsum==3.3.0
 packaging==20.7
